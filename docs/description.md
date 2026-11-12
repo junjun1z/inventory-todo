@@ -17,7 +17,7 @@
 - **Change goals quickly** — mouse wheel over the count (Shift ×16, Ctrl ×64), click to type a number, right-click to use what you have now.
 - **Stays out of your way** — follows the inventory, pins to the left edge, or goes anywhere you drag it. Minimize it to a small icon that shows how many tasks are left.
 - **HUD** — show your unfinished tasks on screen while playing, toggled with a key.
-- **Recipe ingredients** — add the ingredients of an item's crafting recipe to the list in one click, multiplied by your goal.
+- **Recipe ingredients** — Ctrl+click an item's icon to add the ingredients of its crafting recipe, multiplied by what you still need.
 - **Counts open containers too** — with a chest open, the counts include what is inside it (can be turned off).
 - **Per-world or shared lists** — every world and server has its own list by default; switch to one list for all worlds if you prefer.
 - **Key bindings** — add the hovered item with a key, toggle the HUD, and more.

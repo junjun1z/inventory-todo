@@ -20,7 +20,7 @@ A to-do list right next to your inventory — notes and item goals that count up
 - **Quick goal editing** — mouse wheel (Shift ×16, Ctrl ×64), click to type, right-click to use your current amount.
 - **Out of your way** — follow the inventory, pin to the left edge, or drag anywhere; minimize to an icon with the number of open tasks.
 - **HUD** — unfinished tasks on screen while you play (toggle key).
-- **Recipe ingredients** — add an item's crafting ingredients in one click, multiplied by your goal.
+- **Recipe ingredients** — Ctrl+click an item's icon to add its crafting ingredients, multiplied by what you still need.
 - **Counts open containers** — with a chest open, its contents count too (optional).
 - **Per-world or shared lists**, **key bindings**, exact item matching (metadata/NBT), **10 languages**.
 

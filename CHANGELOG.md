@@ -12,7 +12,7 @@ First release.
 - Add items with modifier+click, by clicking the panel with a held item, by name/ID search (English names work in every language) or by drag & drop from a recipe viewer
 - Quick goal editing: mouse wheel (Shift ×16, Ctrl ×64), typing, right-click to use the current amount
 - Three positions (follow inventory, left edge, free) and minimize to an icon
-- HUD showing unfinished tasks, recipe ingredients in one click, counting open containers, per-world or shared lists, key bindings
+- HUD showing unfinished tasks, Ctrl+click to add recipe ingredients, counting open containers, per-world or shared lists, key bindings
 - Optional integration with NEI (original and GTNH fork), JEI, EMI and REI — none of them are required
 - Works in any modpack with any combination of mods; client-side only
 - 10 languages: English, Japanese, Simplified Chinese, Traditional Chinese, Korean, Russian, German, French, Spanish, Brazilian Portuguese
