@@ -1,0 +1,43 @@
+inventorytodo.title=ToDo
+inventorytodo.empty=Notizen oder Items hinzufügen
+inventorytodo.unknown_item=[Unbekanntes Item]
+inventorytodo.btn.addtext=+ Notiz
+inventorytodo.btn.additem=+ Item
+inventorytodo.btn.close=Schließen
+inventorytodo.mode.follow=Am Inventar
+inventorytodo.mode.left=Am linken Rand
+inventorytodo.mode.free=Frei
+inventorytodo.mode.follow.short=I
+inventorytodo.mode.left.short=L
+inventorytodo.mode.free.short=F
+inventorytodo.tip.mini=Klicken zum Öffnen (ziehen zum Verschieben)
+inventorytodo.tip.mini.remaining=Offen: %s
+inventorytodo.tip.minimize=Minimieren
+inventorytodo.tip.mode=Position: %s
+inventorytodo.tip.mode.desc=Klicken: Inventar -> Links -> Frei
+inventorytodo.tip.drag=Ziehen zum Verschieben (wechselt zu frei)
+inventorytodo.tip.check=Erledigt umschalten
+inventorytodo.tip.delete=Zeile löschen
+inventorytodo.tip.addtext=Notizzeile hinzufügen
+inventorytodo.tip.additem=Items nach Name oder ID suchen
+inventorytodo.tip.additem.desc=Oder %s+Klick auf ein Item, oder mit Item in der Hand auf das Panel klicken
+inventorytodo.tip.additem.drop=Items können auch aus dem Rezeptbetrachter hierher gezogen werden
+inventorytodo.tip.search=Teil des Namens oder modid:name[:meta] (Rechtsklick leert)
+inventorytodo.tip.progress=Vorhanden %s / Ziel %s
+inventorytodo.tip.row.icon=Symbol: Linksklick = Rezepte / Rechtsklick = Verwendung
+inventorytodo.tip.row.count=Anzahl: Klick = eingeben / Mausrad = ±1 (Shift 16, Strg 64) / Rechtsklick = aktueller Bestand
+inventorytodo.tip.result=Klicken zum Hinzufügen (Shift+Klick für mehrere)
+inventorytodo.search.hint=Itemname / ID
+inventorytodo.search.prompt=Namen eingeben für Ergebnisse
+inventorytodo.search.none=Nichts gefunden
+inventorytodo.search.count=%s gefunden
+inventorytodo.help.title=So funktioniert ToDo
+inventorytodo.help.edit=Text anklicken zum Bearbeiten (Enter = speichern / Esc = abbrechen)
+inventorytodo.help.modifier=%s+Klick: Item aus dem Inventar hinzufügen
+inventorytodo.help.hold=Mit Item in der Hand auf das Panel klicken: hinzufügen
+inventorytodo.help.drop=Items aus dem Rezeptbetrachter hierher ziehen
+inventorytodo.help.wheel=Mausrad über der Anzahl: Ziel ändern
+inventorytodo.help.auto=Zeilen werden beim Erreichen des Ziels automatisch abgehakt
+inventorytodo.help.recipe=Tasten des Rezeptbetrachters (R / U ...) funktionieren über Items
+inventorytodo.help.reorder=Shift+Mausrad: Zeilen sortieren
+inventorytodo.help.move=Kopfzeile ziehen zum Verschieben, "_" zum Minimieren

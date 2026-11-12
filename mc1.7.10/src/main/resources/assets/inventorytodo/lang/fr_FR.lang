@@ -1,0 +1,43 @@
+inventorytodo.title=ToDo
+inventorytodo.empty=Ajoutez des notes ou des objets
+inventorytodo.unknown_item=[Objet inconnu]
+inventorytodo.btn.addtext=+ Note
+inventorytodo.btn.additem=+ Objet
+inventorytodo.btn.close=Fermer
+inventorytodo.mode.follow=Suivre l'inventaire
+inventorytodo.mode.left=Fixé à gauche
+inventorytodo.mode.free=Position libre
+inventorytodo.mode.follow.short=I
+inventorytodo.mode.left.short=G
+inventorytodo.mode.free.short=L
+inventorytodo.tip.mini=Cliquer pour ouvrir (glisser pour déplacer)
+inventorytodo.tip.mini.remaining=Restant : %s
+inventorytodo.tip.minimize=Réduire
+inventorytodo.tip.mode=Position : %s
+inventorytodo.tip.mode.desc=Cliquer : inventaire -> gauche -> libre
+inventorytodo.tip.drag=Glisser pour déplacer (passe en position libre)
+inventorytodo.tip.check=Marquer comme fait
+inventorytodo.tip.delete=Supprimer cette ligne
+inventorytodo.tip.addtext=Ajouter une note
+inventorytodo.tip.additem=Chercher des objets par nom ou ID
+inventorytodo.tip.additem.desc=Ou %s+clic sur un objet, ou cliquer sur le panneau avec un objet en main
+inventorytodo.tip.additem.drop=Vous pouvez aussi glisser des objets depuis le visualiseur de recettes
+inventorytodo.tip.search=Partie du nom, ou modid:name[:meta] (clic droit pour effacer)
+inventorytodo.tip.progress=Possédé %s / Objectif %s
+inventorytodo.tip.row.icon=Icône : clic gauche = recettes / clic droit = utilisations
+inventorytodo.tip.row.count=Quantité : clic = saisir / molette = ±1 (Maj 16, Ctrl 64) / clic droit = quantité actuelle
+inventorytodo.tip.result=Cliquer pour ajouter (Maj+clic pour continuer)
+inventorytodo.search.hint=Nom d'objet / ID
+inventorytodo.search.prompt=Tapez un nom pour voir les résultats
+inventorytodo.search.none=Aucun résultat
+inventorytodo.search.count=%s trouvé(s)
+inventorytodo.help.title=Utilisation de ToDo
+inventorytodo.help.edit=Cliquer sur le texte pour modifier (Entrée = valider / Échap = annuler)
+inventorytodo.help.modifier=%s+clic : ajouter un objet de l'inventaire
+inventorytodo.help.hold=Cliquer sur le panneau avec un objet en main : ajouter
+inventorytodo.help.drop=Glisser des objets depuis le visualiseur de recettes
+inventorytodo.help.wheel=Molette sur la quantité : changer l'objectif
+inventorytodo.help.auto=Les lignes sont cochées automatiquement quand l'objectif est atteint
+inventorytodo.help.recipe=Les touches du visualiseur de recettes (R / U ...) fonctionnent sur les objets
+inventorytodo.help.reorder=Maj+molette : réordonner les lignes
+inventorytodo.help.move=Glisser l'en-tête pour déplacer, « _ » pour réduire

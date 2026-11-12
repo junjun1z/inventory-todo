@@ -1,0 +1,21 @@
+{
+	"modListVersion": 2,
+	"modList": [{
+		"modid": "${modId}",
+		"name": "${modName}",
+		"description": "Adds a to-do list next to inventory screens: notes, item goals with live counts. Works with any modpack; integrates with NEI when installed.",
+		"version": "${modVersion}",
+		"mcversion": "${minecraftVersion}",
+		"url": "https://github.com/junjun1z/inventory-todo",
+		"updateUrl": "",
+		"authorList": ["junjun1z"],
+		"credits": "",
+		"logoFile": "",
+		"screenshots": [],
+		"parent": "",
+		"requiredMods": [],
+		"dependencies": [],
+		"dependants": [],
+		"useDependencyInformation": true
+	}]
+}

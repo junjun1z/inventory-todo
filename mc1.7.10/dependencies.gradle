@@ -1,0 +1,5 @@
+dependencies {
+    // NEI is optional. Compiled against the GTNH fork, but only APIs that also exist in
+    // ChickenBones' original NEI 1.0.5.x are used (all interface methods are implemented explicitly).
+    compileOnly("com.github.GTNewHorizons:NotEnoughItems:2.8.171-GTNH:dev")
+}

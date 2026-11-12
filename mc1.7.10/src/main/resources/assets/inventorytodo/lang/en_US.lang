@@ -1,0 +1,43 @@
+inventorytodo.title=ToDo
+inventorytodo.empty=Add notes or items here
+inventorytodo.unknown_item=[Unknown item]
+inventorytodo.btn.addtext=+ Note
+inventorytodo.btn.additem=+ Item
+inventorytodo.btn.close=Close
+inventorytodo.mode.follow=Follow inventory
+inventorytodo.mode.left=Pinned to left edge
+inventorytodo.mode.free=Free position
+inventorytodo.mode.follow.short=F
+inventorytodo.mode.left.short=L
+inventorytodo.mode.free.short=M
+inventorytodo.tip.mini=Click to open ToDo (drag to move)
+inventorytodo.tip.mini.remaining=Remaining: %s
+inventorytodo.tip.minimize=Minimize
+inventorytodo.tip.mode=Position: %s
+inventorytodo.tip.mode.desc=Click to cycle Follow -> Left -> Free
+inventorytodo.tip.drag=Drag to move (switches to free position)
+inventorytodo.tip.check=Toggle done
+inventorytodo.tip.delete=Delete this row
+inventorytodo.tip.addtext=Add a note row
+inventorytodo.tip.additem=Search items by name or ID
+inventorytodo.tip.additem.desc=Or %s+click an item, or click the panel while holding one
+inventorytodo.tip.additem.drop=You can also drag items here from the recipe viewer
+inventorytodo.tip.search=Part of a name, or modid:name[:meta] (right-click clears)
+inventorytodo.tip.progress=Have %s / Goal %s
+inventorytodo.tip.row.icon=Icon: left-click = recipes / right-click = usages
+inventorytodo.tip.row.count=Count: click = type / wheel = +-1 (Shift 16, Ctrl 64) / right-click = set to current
+inventorytodo.tip.result=Click to add (Shift+click to keep adding)
+inventorytodo.search.hint=Item name / ID
+inventorytodo.search.prompt=Type a name to see results
+inventorytodo.search.none=Nothing found
+inventorytodo.search.count=%s found
+inventorytodo.help.title=How to use ToDo
+inventorytodo.help.edit=Click text to edit (Enter = save / Esc = cancel)
+inventorytodo.help.modifier=%s+click: add an inventory item
+inventorytodo.help.hold=Click the panel while holding an item to add it
+inventorytodo.help.drop=Drag items here from the recipe viewer
+inventorytodo.help.wheel=Wheel over the count: change the goal
+inventorytodo.help.auto=Rows are checked automatically when the goal is reached
+inventorytodo.help.recipe=Recipe viewer keys (R / U ...) work over items
+inventorytodo.help.reorder=Shift+wheel: reorder rows
+inventorytodo.help.move=Drag the header to move, "_" to minimize

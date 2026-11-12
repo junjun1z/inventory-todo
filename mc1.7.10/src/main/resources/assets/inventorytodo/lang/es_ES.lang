@@ -1,0 +1,43 @@
+inventorytodo.title=ToDo
+inventorytodo.empty=Añade notas u objetos
+inventorytodo.unknown_item=[Objeto desconocido]
+inventorytodo.btn.addtext=+ Nota
+inventorytodo.btn.additem=+ Objeto
+inventorytodo.btn.close=Cerrar
+inventorytodo.mode.follow=Seguir inventario
+inventorytodo.mode.left=Fijo a la izquierda
+inventorytodo.mode.free=Posición libre
+inventorytodo.mode.follow.short=I
+inventorytodo.mode.left.short=Z
+inventorytodo.mode.free.short=L
+inventorytodo.tip.mini=Clic para abrir (arrastra para mover)
+inventorytodo.tip.mini.remaining=Pendientes: %s
+inventorytodo.tip.minimize=Minimizar
+inventorytodo.tip.mode=Posición: %s
+inventorytodo.tip.mode.desc=Clic: inventario -> izquierda -> libre
+inventorytodo.tip.drag=Arrastra para mover (cambia a posición libre)
+inventorytodo.tip.check=Marcar como hecho
+inventorytodo.tip.delete=Eliminar esta fila
+inventorytodo.tip.addtext=Añadir una nota
+inventorytodo.tip.additem=Buscar objetos por nombre o ID
+inventorytodo.tip.additem.desc=O %s+clic en un objeto, o clic en el panel con un objeto en la mano
+inventorytodo.tip.additem.drop=También puedes arrastrar objetos desde el visor de recetas
+inventorytodo.tip.search=Parte del nombre, o modid:name[:meta] (clic derecho borra)
+inventorytodo.tip.progress=Tienes %s / Meta %s
+inventorytodo.tip.row.icon=Icono: clic izquierdo = recetas / clic derecho = usos
+inventorytodo.tip.row.count=Cantidad: clic = escribir / rueda = ±1 (Mayús 16, Ctrl 64) / clic derecho = cantidad actual
+inventorytodo.tip.result=Clic para añadir (Mayús+clic para seguir añadiendo)
+inventorytodo.search.hint=Nombre / ID
+inventorytodo.search.prompt=Escribe un nombre para ver resultados
+inventorytodo.search.none=Sin resultados
+inventorytodo.search.count=%s encontrados
+inventorytodo.help.title=Cómo usar ToDo
+inventorytodo.help.edit=Clic en el texto para editar (Intro = guardar / Esc = cancelar)
+inventorytodo.help.modifier=%s+clic: añadir un objeto del inventario
+inventorytodo.help.hold=Clic en el panel con un objeto en la mano: añadir
+inventorytodo.help.drop=Arrastra objetos desde el visor de recetas
+inventorytodo.help.wheel=Rueda sobre la cantidad: cambiar la meta
+inventorytodo.help.auto=Las filas se marcan solas al alcanzar la meta
+inventorytodo.help.recipe=Las teclas del visor de recetas (R / U ...) funcionan sobre los objetos
+inventorytodo.help.reorder=Mayús+rueda: reordenar filas
+inventorytodo.help.move=Arrastra la cabecera para mover, "_" para minimizar
