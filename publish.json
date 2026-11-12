@@ -1,0 +1,24 @@
+{
+  "artifacts": [
+    {
+      "path": "mc1.7.10/build/libs/inventorytodo-*.jar",
+      "exclude": [
+        "*-dev.jar",
+        "*-sources.jar"
+      ],
+      "loaders": [
+        "forge"
+      ],
+      "game_versions": [
+        "1.7.10"
+      ],
+      "java": 8,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "notenoughitems"
+        ]
+      }
+    }
+  ]
+}

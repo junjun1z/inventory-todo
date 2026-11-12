@@ -1,0 +1,128 @@
+name: Release
+
+# Push a tag like 1.2.3 (no "v") to build every target and publish it to
+# GitHub Releases, Modrinth and CurseForge. Can also be run by hand (dry run by default).
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build, e.g. 1.2.3'
+        required: true
+      dry_run:
+        description: 'Dry run (build and check only, publish nothing)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_VERSION: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check version format
+        run: |
+          echo "$RELEASE_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$' || { echo "Bad version: $RELEASE_VERSION"; exit 1; }
+          echo "Version: $RELEASE_VERSION  dry run: $DRY_RUN"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            8
+            17
+            21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - run: pip install requests
+
+      - name: Build 1.7.10
+        working-directory: mc1.7.10
+        env:
+          VERSION: ${{ env.RELEASE_VERSION }}
+        run: |
+          chmod +x gradlew
+          ./gradlew build --no-daemon --stacktrace
+
+      - name: Build modern versions
+        if: hashFiles('modern/gradlew') != ''
+        working-directory: modern
+        env:
+          MOD_VERSION: ${{ env.RELEASE_VERSION }}
+        run: |
+          chmod +x gradlew
+          if [ -f ci-build.sh ]; then
+            bash ci-build.sh
+          else
+            ./gradlew build --no-daemon --stacktrace -Pmod_version="$MOD_VERSION"
+          fi
+
+      - name: Collect files
+        id: files
+        run: |
+          python tools/publish.py --version "$RELEASE_VERSION" --list-files > release-files.txt
+          cat release-files.txt
+          python tools/publish.py --version "$RELEASE_VERSION" --print-changelog > release-notes.md
+          echo "---- changelog ----"; cat release-notes.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: inventorytodo-${{ env.RELEASE_VERSION }}
+          path: |
+            mc1.7.10/build/libs/inventorytodo-*.jar
+            modern/**/build/libs/inventorytodo-*.jar
+          if-no-files-found: error
+
+      - name: Check uploads (dry run)
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+        run: python tools/publish.py --version "$RELEASE_VERSION" --dry-run
+
+      - name: GitHub Release
+        if: env.DRY_RUN != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$RELEASE_VERSION" > /dev/null 2>&1; then
+            gh release upload "$RELEASE_VERSION" $(cat release-files.txt) --clobber
+          else
+            gh release create "$RELEASE_VERSION" $(cat release-files.txt) \
+              --title "Inventory ToDo $RELEASE_VERSION" --notes-file release-notes.md --target "$GITHUB_SHA"
+          fi
+
+      - name: Publish to Modrinth
+        if: env.DRY_RUN != 'true'
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MODRINTH_PROJECT_ID: ${{ vars.MODRINTH_PROJECT_ID }}
+        run: python tools/publish.py --version "$RELEASE_VERSION" --only modrinth
+
+      - name: Publish to CurseForge
+        if: env.DRY_RUN != 'true'
+        env:
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+        run: python tools/publish.py --version "$RELEASE_VERSION" --only curseforge
