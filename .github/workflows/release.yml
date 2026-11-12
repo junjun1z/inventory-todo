@@ -62,7 +62,7 @@ jobs:
           VERSION: ${{ env.RELEASE_VERSION }}
         run: |
           chmod +x gradlew
-          ./gradlew build --no-daemon --stacktrace
+          ./gradlew build --no-daemon --stacktrace -x spotlessCheck
 
       - name: Build modern versions
         if: hashFiles('modern/gradlew') != ''

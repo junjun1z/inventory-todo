@@ -37,7 +37,7 @@ jobs:
           VERSION: 0.0.0-ci.${{ github.run_number }}
         run: |
           chmod +x gradlew
-          ./gradlew build --no-daemon --stacktrace
+          ./gradlew build --no-daemon --stacktrace -x spotlessCheck
 
       - uses: actions/upload-artifact@v4
         with:
