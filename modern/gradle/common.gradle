@@ -1,0 +1,87 @@
+// Settings shared by every target. Applied by the loader scripts after their plugin.
+def mcv = project.property('mc_version') as String
+def loader = project.property('loader') as String
+def javaVersion = (project.property('java_version') as String).toInteger()
+
+// Version: -Pmod_version=X.Y.Z > MOD_VERSION environment variable > gradle.properties (0.0.0-dev)
+def cliVersion = gradle.startParameter.projectProperties['mod_version']
+def envVersion = System.getenv('MOD_VERSION')
+version = cliVersion ?: (envVersion ?: project.property('mod_version'))
+group = project.property('mod_group')
+base { archivesName = "inventorytodo-${loader}-${mcv}" }
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(javaVersion) }
+}
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = javaVersion
+}
+
+def root = rootProject.projectDir
+sourceSets {
+    main {
+        java {
+            srcDir new File(root, 'common/src/main/java')
+            srcDir new File(root, "versions/${project.property('code_version')}/src/main/java")
+            srcDir new File(root, "loaders/${loader}/${project.property('code_version')}/src/main/java")
+            // development self-test, only with -Pselftest (never in release jars)
+            if (project.hasProperty('selftest')) {
+                srcDir new File(root, 'devtest/common/java')
+                srcDir new File(root, "devtest/${project.property('code_version')}/java")
+                srcDir new File(root, "devtest/${loader}/${project.property('code_version')}/java")
+            }
+        }
+        resources {
+            srcDir new File(root, 'common/src/main/resources')
+            srcDir new File(root, "loaders/${loader}/${project.property('code_version')}/src/main/resources")
+        }
+    }
+}
+
+repositories {
+    maven { name = 'BlameJared (JEI)'; url = 'https://maven.blamejared.com/' }
+    maven { name = 'TerraformersMC (EMI)'; url = 'https://maven.terraformersmc.com/' }
+    maven { name = 'Shedaniel (REI)'; url = 'https://maven.shedaniel.me/' }
+    maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+}
+
+def expandProps = [
+    version      : project.version,
+    mod_id       : project.property('mod_id'),
+    mod_name     : project.property('mod_name'),
+    mod_authors  : project.property('mod_authors'),
+    mod_license  : project.property('mod_license'),
+    mod_description: project.property('mod_description'),
+    mod_homepage : project.property('mod_homepage'),
+    mod_issues   : project.property('mod_issues'),
+    mc_version   : mcv,
+    mc_range     : project.findProperty('mc_range') ?: mcv,
+    loader_range : project.findProperty('loader_range') ?: '*',
+    java_version : javaVersion,
+]
+processResources {
+    inputs.properties(expandProps)
+    // mod icon: single source in docs/
+    def icon = new File(root, '../docs/icon_128.png')
+    if (icon.exists()) from(icon) { into 'assets/inventorytodo'; rename { 'icon.png' } }
+    filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand expandProps
+    }
+}
+
+jar {
+    from(new File(root, '../LICENSE')) { rename { 'LICENSE_inventorytodo' } }
+    manifest {
+        attributes(
+            'Implementation-Title': 'Inventory ToDo',
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': 'junjun1z'
+        )
+    }
+}
+
+// Optional recipe viewer APIs (compile only; never required at runtime)
+dependencies {
+    if (project.hasProperty('jei_api')) compileOnly "mezz.jei:jei-${mcv}-common-api:${project.property('jei_api')}"
+}

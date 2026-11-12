@@ -19,6 +19,276 @@
           "notenoughitems"
         ]
       }
+    },
+    {
+      "path": "modern/targets/1.20.1-fabric/build/libs/inventorytodo-fabric-1.20.1-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "1.20.1"
+      ],
+      "java": 17,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.20.1-forge/build/libs/inventorytodo-forge-1.20.1-*.jar",
+      "loaders": [
+        "forge"
+      ],
+      "game_versions": [
+        "1.20.1"
+      ],
+      "java": 17,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.21.1-fabric/build/libs/inventorytodo-fabric-1.21.1-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "1.21.1"
+      ],
+      "java": 21,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.21.1-neoforge/build/libs/inventorytodo-neoforge-1.21.1-*.jar",
+      "loaders": [
+        "neoforge"
+      ],
+      "game_versions": [
+        "1.21.1"
+      ],
+      "java": 21,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/26.3-fabric/build/libs/inventorytodo-fabric-26.3-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "26.3"
+      ],
+      "java": 25,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/26.3-neoforge/build/libs/inventorytodo-neoforge-26.3-*.jar",
+      "loaders": [
+        "neoforge"
+      ],
+      "game_versions": [
+        "26.3"
+      ],
+      "java": 25,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/26.1.2-fabric/build/libs/inventorytodo-fabric-26.1.2-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "26.1",
+        "26.1.1",
+        "26.1.2"
+      ],
+      "java": 25,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/26.1.2-neoforge/build/libs/inventorytodo-neoforge-26.1.2-*.jar",
+      "loaders": [
+        "neoforge"
+      ],
+      "game_versions": [
+        "26.1",
+        "26.1.1",
+        "26.1.2"
+      ],
+      "java": 25,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/26.2-fabric/build/libs/inventorytodo-fabric-26.2-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "26.2"
+      ],
+      "java": 25,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/26.2-neoforge/build/libs/inventorytodo-neoforge-26.2-*.jar",
+      "loaders": [
+        "neoforge"
+      ],
+      "game_versions": [
+        "26.2"
+      ],
+      "java": 25,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.19.2-fabric/build/libs/inventorytodo-fabric-1.19.2-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "1.19.2"
+      ],
+      "java": 17,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.19.2-forge/build/libs/inventorytodo-forge-1.19.2-*.jar",
+      "loaders": [
+        "forge"
+      ],
+      "game_versions": [
+        "1.19.2"
+      ],
+      "java": 17,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.18.2-fabric/build/libs/inventorytodo-fabric-1.18.2-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "1.18.2"
+      ],
+      "java": 17,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.18.2-forge/build/libs/inventorytodo-forge-1.18.2-*.jar",
+      "loaders": [
+        "forge"
+      ],
+      "game_versions": [
+        "1.18.2"
+      ],
+      "java": 17,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
     }
   ]
 }

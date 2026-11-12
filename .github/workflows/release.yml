@@ -46,6 +46,7 @@ jobs:
           java-version: |
             8
             17
+            25
             21
 
       - uses: gradle/actions/setup-gradle@v4
@@ -68,6 +69,7 @@ jobs:
         if: hashFiles('modern/gradlew') != ''
         working-directory: modern
         env:
+          JAVA_HOME: ${{ env.JAVA_HOME_25_X64 }}
           MOD_VERSION: ${{ env.RELEASE_VERSION }}
         run: |
           chmod +x gradlew

@@ -26,6 +26,7 @@ jobs:
           java-version: |
             8
             17
+            25
             21
 
       - uses: gradle/actions/setup-gradle@v4
@@ -68,6 +69,7 @@ jobs:
           java-version: |
             8
             17
+            25
             21
 
       - uses: gradle/actions/setup-gradle@v4
@@ -77,6 +79,7 @@ jobs:
         if: steps.detect.outputs.present == 'true'
         working-directory: modern
         env:
+          JAVA_HOME: ${{ env.JAVA_HOME_25_X64 }}
           MOD_VERSION: 0.0.0-ci.${{ github.run_number }}
         run: |
           chmod +x gradlew

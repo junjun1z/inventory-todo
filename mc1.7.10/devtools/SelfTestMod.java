@@ -239,8 +239,9 @@ public class SelfTestMod {
         try {
             switch (step) {
                 case 0:
+                    // wait a while on the main menu: big packs are still finishing work in the background
                     if (mc.theWorld == null && mc.currentScreen != null
-                        && (mc.currentScreen instanceof GuiMainMenu || ++menuTicks > 200)) {
+                        && ((mc.currentScreen instanceof GuiMainMenu ? ++menuTicks > 200 : ++menuTicks > 600))) {
                         info(
                             "mode=" + (nei ? (gtnhNei ? "NEI (GTNH fork)" : "NEI (original)") : "standalone")
                                 + " integration="

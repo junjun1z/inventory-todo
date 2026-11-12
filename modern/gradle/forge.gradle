@@ -1,0 +1,18 @@
+// MinecraftForge 1.17 - 1.20.1 through ModDevGradle's legacy plugin (reobfuscates to SRG for production)
+apply plugin: 'net.neoforged.moddev.legacyforge'
+apply from: rootProject.file('gradle/common.gradle')
+
+legacyForge {
+    version = "${project.property('mc_version')}-${project.property('forge_version')}"
+    runs {
+        client { client() }
+    }
+    mods {
+        inventorytodo { sourceSet sourceSets.main }
+    }
+}
+
+dependencies {
+    def extra = rootProject.file("gradle/deps-forge-${project.property('code_version')}.gradle")
+    if (extra.exists()) apply from: extra, to: project
+}

@@ -1,0 +1,3 @@
+// Build file shared by every target (targets/<mc>-<loader>/gradle.properties sets mc_version, loader, ...)
+def loader = project.property('loader')
+apply from: rootProject.file("gradle/${loader}.gradle")

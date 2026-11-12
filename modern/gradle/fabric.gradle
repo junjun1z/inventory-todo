@@ -1,0 +1,29 @@
+def mcv = project.property('mc_version') as String
+// Minecraft 26.1+ is no longer obfuscated: no mappings / remapping needed
+def unobf = mcv ==~ /^2\d\..*/
+apply plugin: unobf ? 'net.fabricmc.fabric-loom' : 'net.fabricmc.fabric-loom-remap'
+apply from: rootProject.file('gradle/common.gradle')
+
+def root = rootProject.projectDir
+loom {
+    def aw = new File(root, "loaders/fabric/${project.property('code_version')}/src/main/resources/inventorytodo.accesswidener")
+    if (aw.exists()) accessWidenerPath = aw
+    runs {
+        client { client(); ideConfigGenerated false }
+        remove server
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mcv}"
+    if (unobf) {
+        implementation "net.fabricmc:fabric-loader:${project.property('fabric_loader')}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${project.property('fabric_api')}"
+    } else {
+        mappings loom.officialMojangMappings()
+        modImplementation "net.fabricmc:fabric-loader:${project.property('fabric_loader')}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.property('fabric_api')}"
+    }
+    def extra = rootProject.file("gradle/deps-fabric-${project.property('code_version')}.gradle")
+    if (extra.exists()) apply from: extra, to: project
+}

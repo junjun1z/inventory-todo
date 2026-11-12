@@ -1,0 +1,15 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}" apply false
+    id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
+    id 'net.neoforged.moddev' version "${moddev_version}" apply false
+    id 'net.neoforged.moddev.legacyforge' version "${moddev_version}" apply false
+}
+
+// Copies every release jar into build/dist (handy for CI and manual uploads)
+tasks.register('collectJars', Copy) {
+    group = 'build'
+    description = 'Builds all targets and copies their jars to build/dist'
+    subprojects.each { p -> dependsOn("${p.path}:build") }
+    from(subprojects.collect { new File(it.projectDir, 'build/libs') }) { include 'inventorytodo-*.jar' }
+    into layout.buildDirectory.dir('dist')
+}

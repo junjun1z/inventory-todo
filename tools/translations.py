@@ -181,11 +181,69 @@ T["pt_BR"] = [
     "As teclas do visualizador de receitas (R / U ...) funcionam sobre os itens", "Shift+roda: reordenar linhas",
     "Arraste o cabeçalho para mover, \"_\" para minimizar"]
 
-out = sys.argv[1]
-os.makedirs(out, exist_ok=True)
-for lang, vals in T.items():
-    assert len(vals) == len(KEYS), (lang, len(vals), len(KEYS))
-    with open(os.path.join(out, lang + ".lang"), "w", encoding="utf-8", newline="\n") as f:
-        for k, v in zip(KEYS, vals):
-            f.write("inventorytodo." + k + "=" + v + "\n")
-print("ok", len(T))
+# ---------------------------------------------------------------------------
+# Output. Usage:
+#   python tools/translations.py <dir>          -> 1.7.10 .lang files
+#   python tools/translations.py <dir> --json   -> 1.13+ JSON files (lower-case names)
+# Optional extra tables with the same structure (KEYS + T) are merged when present:
+#   translations_features.py  (features shared by all versions; both outputs)
+#   translations_modern.py    (keys only the modern versions use; JSON only)
+# Keys starting with "!" are written as-is, others get the "inventorytodo." prefix.
+# ---------------------------------------------------------------------------
+
+NL = chr(10)
+
+
+def _load_extra(name):
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), name + ".py")
+    if not os.path.exists(path):
+        return None
+    ns = {}
+    with open(path, encoding="utf-8") as f:
+        exec(compile(f.read(), path, "exec"), ns)
+    return ns["KEYS"], ns["T"]
+
+
+def merged(json_mode):
+    keys = list(KEYS)
+    tables = {lang: list(vals) for lang, vals in T.items()}
+    for name in ["translations_features"] + (["translations_modern"] if json_mode else []):
+        extra = _load_extra(name)
+        if extra is None:
+            continue
+        k2, t2 = extra
+        for lang, vals in t2.items():
+            assert len(vals) == len(k2), (name, lang, len(vals), len(k2))
+        keys += k2
+        for lang in tables:
+            tables[lang] += t2.get(lang, t2["en_US"])
+    return keys, tables
+
+
+def full_key(k):
+    return k[1:] if k.startswith("!") else "inventorytodo." + k
+
+
+def main():
+    out = sys.argv[1]
+    json_mode = "--json" in sys.argv[2:]
+    keys, tables = merged(json_mode)
+    os.makedirs(out, exist_ok=True)
+    for lang, vals in tables.items():
+        assert len(vals) == len(keys), (lang, len(vals), len(keys))
+        if json_mode:
+            import json
+            data = {full_key(k): v for k, v in zip(keys, vals)}
+            with open(os.path.join(out, lang.lower() + ".json"), "w", encoding="utf-8", newline=NL) as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+                f.write(NL)
+        else:
+            with open(os.path.join(out, lang + ".lang"), "w", encoding="utf-8", newline=NL) as f:
+                for k, v in zip(keys, vals):
+                    if not k.startswith("!"):
+                        f.write(full_key(k) + "=" + v + NL)
+    print("ok", len(tables), "languages,", len(keys), "keys", "(json)" if json_mode else "(.lang)")
+
+
+if __name__ == "__main__":
+    main()
