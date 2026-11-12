@@ -166,6 +166,14 @@ class Modrinth:
         if r.status_code >= 300:
             raise RuntimeError("Modrinth upload failed (%d): %s" % (r.status_code, r.text[:500]))
         log("  Modrinth: uploaded %s" % number)
+        # Modrinth requires an environment per version (v3 field; v2 uploads leave it "unknown").
+        # The mod is client-side only.
+        vid = r.json().get("id")
+        if vid:
+            e = self.s.patch("https://api.modrinth.com/v3/version/%s" % vid,
+                             json={"environment": "client_only"}, timeout=30)
+            if e.status_code >= 300:
+                log("  WARN: could not set environment on %s (%d)" % (number, e.status_code))
 
 
 # --------------------------------------------------------------------------- CurseForge
