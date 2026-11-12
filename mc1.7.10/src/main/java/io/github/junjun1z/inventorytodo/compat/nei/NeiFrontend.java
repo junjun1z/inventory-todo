@@ -7,9 +7,6 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import io.github.junjun1z.inventorytodo.TodoPanel;
-import io.github.junjun1z.inventorytodo.compat.Compat;
-
 import codechicken.nei.VisiblityData;
 import codechicken.nei.api.API;
 import codechicken.nei.api.INEIGuiHandler;
@@ -19,6 +16,8 @@ import codechicken.nei.guihook.IContainerDrawHandler;
 import codechicken.nei.guihook.IContainerInputHandler;
 import codechicken.nei.guihook.IContainerObjectHandler;
 import codechicken.nei.guihook.IContainerTooltipHandler;
+import io.github.junjun1z.inventorytodo.TodoPanel;
+import io.github.junjun1z.inventorytodo.compat.Compat;
 
 /**
  * Connects the panel to NEI's GUI hooks.

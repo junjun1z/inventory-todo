@@ -7,19 +7,20 @@ import net.minecraft.item.ItemStack;
 
 import org.lwjgl.opengl.GL11;
 
-import io.github.junjun1z.inventorytodo.compat.VanillaIntegration;
-
 import codechicken.nei.ItemList;
 import codechicken.nei.guihook.GuiContainerManager;
 import codechicken.nei.recipe.GuiCraftingRecipe;
 import codechicken.nei.recipe.GuiUsageRecipe;
+import io.github.junjun1z.inventorytodo.compat.VanillaIntegration;
 
 /** NEI-backed integration. Only uses APIs present in both the original NEI 1.0.5.x and the GTNH fork. */
 public class NeiIntegration extends VanillaIntegration {
 
     @Override
     public ItemStack hoveredStack(GuiContainer gui, int mx, int my) {
-        // includes the NEI item list, bookmarks and recipe screens
+        ItemStack slot = super.hoveredStack(gui, mx, my);
+        if (slot != null) return slot;
+        // NEI item list, bookmarks and recipe screens
         return GuiContainerManager.getStackMouseOver(gui);
     }
 

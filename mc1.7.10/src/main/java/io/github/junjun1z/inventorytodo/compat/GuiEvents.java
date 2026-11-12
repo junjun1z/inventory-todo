@@ -4,9 +4,8 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.common.MinecraftForge;
 
-import io.github.junjun1z.inventorytodo.TodoPanel;
-
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import io.github.junjun1z.inventorytodo.TodoPanel;
 
 /** Events used in every mode. */
 public final class GuiEvents {

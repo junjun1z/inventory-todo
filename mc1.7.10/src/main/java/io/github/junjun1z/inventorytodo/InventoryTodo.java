@@ -24,7 +24,8 @@ import cpw.mods.fml.relauncher.Side;
     version = Tags.VERSION,
     acceptedMinecraftVersions = "[1.7.10]",
     acceptableRemoteVersions = "*",
-    dependencies = "after:NotEnoughItems")
+    dependencies = "after:NotEnoughItems",
+    guiFactory = "io.github.junjun1z.inventorytodo.GuiFactory")
 public class InventoryTodo {
 
     public static final String MODID = "inventorytodo";
@@ -52,7 +53,8 @@ public class InventoryTodo {
 
     /** Copies lists and settings from the old "GTNH ToDo" mod the first time. */
     private static void migrateFromGtnhTodo(File oldDir, File newDir) {
-        if (newDir.exists() || !oldDir.isDirectory()) return;
+        // migrate unless this mod already has lists (the folder itself may exist, e.g. created for the config)
+        if (new File(newDir, "lists").exists() || !oldDir.isDirectory()) return;
         try {
             newDir.mkdirs();
             File oldLists = new File(oldDir, "lists");
@@ -64,8 +66,10 @@ public class InventoryTodo {
                     if (f.isFile()) Files.copy(f.toPath(), new File(newLists, f.getName()).toPath());
                 }
             }
-            copyIfExists(new File(oldDir, "ui.json"), new File(newDir, "ui.json"));
-            copyIfExists(new File(oldDir, "gtnhtodo.cfg"), new File(newDir, MODID + ".cfg"));
+            File ui = new File(newDir, "ui.json");
+            if (!ui.exists()) copyIfExists(new File(oldDir, "ui.json"), ui);
+            File cfg = new File(newDir, MODID + ".cfg");
+            if (!cfg.exists()) copyIfExists(new File(oldDir, "gtnhtodo.cfg"), cfg);
             LOG.info("Imported lists and settings from config/gtnhtodo");
         } catch (IOException e) {
             LOG.warn("Could not import data from config/gtnhtodo", e);

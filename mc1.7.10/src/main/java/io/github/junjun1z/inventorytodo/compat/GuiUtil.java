@@ -4,9 +4,8 @@ import java.lang.reflect.Field;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 
-import io.github.junjun1z.inventorytodo.InventoryTodo;
-
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import io.github.junjun1z.inventorytodo.InventoryTodo;
 
 /** Access to protected GuiContainer fields. */
 public final class GuiUtil {

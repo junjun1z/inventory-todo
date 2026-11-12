@@ -58,6 +58,7 @@ public final class TodoStore {
 
     /** Key for the current world/server (used as the file name) */
     public static String computeWorldKey() {
+        if ("GLOBAL".equalsIgnoreCase(TodoConfig.listScope)) return "global";
         Minecraft mc = Minecraft.getMinecraft();
         try {
             if (mc.isSingleplayer() && mc.getIntegratedServer() != null) {

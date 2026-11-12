@@ -30,10 +30,6 @@ import net.minecraft.world.WorldType;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
-import io.github.junjun1z.inventorytodo.compat.Compat;
-import io.github.junjun1z.inventorytodo.compat.GuiUtil;
-import io.github.junjun1z.inventorytodo.compat.VanillaFrontend;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -41,6 +37,9 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import io.github.junjun1z.inventorytodo.compat.Compat;
+import io.github.junjun1z.inventorytodo.compat.GuiUtil;
+import io.github.junjun1z.inventorytodo.compat.VanillaFrontend;
 
 /**
  * Development-only automated test. Never shipped: only compiled into a separate test jar.
@@ -505,13 +504,78 @@ public class SelfTestMod {
                     check("Save + reload keeps the rows", st.entries.size() == n - 1, st.entries.size());
                     check("NBT (named sword) survives save/reload", nbtOk, null);
                     check("Damage value (red wool 14) survives save/reload", metaOk, null);
-                    step = 20;
+                    step = 13;
                     wait = 5;
+                    return;
+                }
+                case 13: {
+                    TodoStore st = store();
+                    // ingredients of a crafting table (vanilla: 4 planks; modpacks may change the recipe)
+                    TodoPanel.INSTANCE
+                        .dropStack(gui, geti("px") + 20, geti("py") + 20, new ItemStack(Blocks.crafting_table));
+                    int idx = st.entries.size() - 1;
+                    st.entries.get(idx).target = 1;
+                    int before = st.entries.size();
+                    Method ai = TodoPanel.class.getDeclaredMethod("addIngredients", int.class);
+                    ai.setAccessible(true);
+                    ai.invoke(TodoPanel.INSTANCE, idx);
+                    String status = (String) get(TodoPanel.INSTANCE, "status");
+                    if (gtnhNei) {
+                        check(
+                            "Ingredients: added or 'no recipe' message",
+                            st.entries.size() > before || status != null,
+                            status);
+                    } else {
+                        boolean planks = false;
+                        for (TodoEntry en : st.entries) if (en.item != null
+                            && en.item.getItem() == net.minecraft.item.Item.getItemFromBlock(Blocks.planks)
+                            && en.target == 4) planks = true;
+                        check("Ctrl+click ingredients: crafting table -> 4 planks", planks, st.entries.size() - before);
+                    }
+                    shot("11_ingredients");
+                    // the crafting grid of the inventory counts as an open container
+                    TodoEntry iron = null;
+                    for (TodoEntry en : st.entries)
+                        if (en.item != null && en.item.getItem() == Items.iron_ingot) iron = en;
+                    Slot grid = (Slot) gui.inventorySlots.inventorySlots.get(1);
+                    grid.putStack(new ItemStack(Items.iron_ingot, 5));
+                    Method rc = TodoPanel.class.getDeclaredMethod("recount");
+                    rc.setAccessible(true);
+                    rc.invoke(TodoPanel.INSTANCE);
+                    check(
+                        "Items in the open container are counted too",
+                        iron != null && iron.have == 37,
+                        iron == null ? null : iron.have);
+                    grid.putStack(null);
+                    rc.invoke(TodoPanel.INSTANCE);
+                    // HUD button
+                    boolean hudBefore = TodoConfig.hudEnabled;
+                    click(geti("px") + geti("pw") - 47 + 3, geti("py") + 4, 0);
+                    check("H button toggles the HUD", TodoConfig.hudEnabled != hudBefore, TodoConfig.hudEnabled);
+                    if (!TodoConfig.hudEnabled) click(geti("px") + geti("pw") - 47 + 3, geti("py") + 4, 0);
+                    check("HUD enabled again", TodoConfig.hudEnabled, null);
+                    for (TodoEntry en : st.entries) en.manualDone = false;
+                    mc.displayGuiScreen(null);
+                    gui = null;
+                    step++;
+                    wait = 20;
+                    return;
+                }
+                case 14: {
+                    shot("12_hud");
+                    List<TodoEntry> hud = TodoPanel.INSTANCE.entriesForHud();
+                    check("HUD has rows to show", !hud.isEmpty(), hud.size());
+                    openInv();
+                    step = 20;
+                    wait = 10;
                     return;
                 }
 
                 // ---------------- real OS input via java.awt.Robot ----------------
                 case 20: {
+                    // dock the panel again so it cannot cover inventory slots during the real-input tests
+                    store().mode = TodoStore.Mode.FOLLOW;
+                    store().minimized = false;
                     shot("08_before_robot");
                     try {
                         System.setProperty("java.awt.headless", "false");
@@ -644,8 +708,8 @@ public class SelfTestMod {
                     check("Item put back", mc.thePlayer.inventory.getItemStack() == null, null);
                     // real drag of the header: press, move while held
                     TodoStore st = store();
-                    dragBeforeX = st.freeX;
-                    dragBeforeY = st.freeY;
+                    dragBeforeX = geti("px");
+                    dragBeforeY = geti("py");
                     robotMoveGui(geti("px") + 20, geti("py") + 5);
                     robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
                     step = 31;
@@ -662,7 +726,7 @@ public class SelfTestMod {
                     TodoStore st = store();
                     check(
                         "Real drag follows the cursor while held",
-                        st.freeX > dragBeforeX + 20 && st.freeY > dragBeforeY + 10,
+                        st.mode == TodoStore.Mode.FREE && st.freeX > dragBeforeX + 20 && st.freeY > dragBeforeY + 10,
                         dragBeforeX + "," + dragBeforeY + " -> " + st.freeX + "," + st.freeY);
                     robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
                     step++;

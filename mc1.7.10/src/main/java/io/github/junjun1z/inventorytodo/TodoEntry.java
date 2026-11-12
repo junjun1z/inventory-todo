@@ -37,11 +37,19 @@ public class TodoEntry {
         return item != null && target > 0 && have >= target;
     }
 
+    /** Wildcard damage (32767, "any") cannot be drawn or named: use damage 0 for display only */
+    public static ItemStack renderable(ItemStack stack) {
+        if (stack == null || stack.getItemDamage() != 32767) return stack;
+        ItemStack copy = stack.copy();
+        copy.setItemDamage(0);
+        return copy;
+    }
+
     public String displayText() {
         if (text != null && !text.isEmpty()) return text;
         if (item != null) {
             try {
-                return item.getDisplayName();
+                return renderable(item).getDisplayName();
             } catch (Throwable t) {
                 return "???";
             }

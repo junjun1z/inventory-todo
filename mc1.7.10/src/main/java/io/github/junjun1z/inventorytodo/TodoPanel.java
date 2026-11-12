@@ -11,7 +11,10 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
@@ -88,6 +91,10 @@ public final class TodoPanel {
     private long flashUntil;
 
     private int tickCounter;
+
+    // ---- short status message in the footer ----
+    private String status;
+    private long statusUntil;
 
     private TodoPanel() {}
 
@@ -216,6 +223,7 @@ public final class TodoPanel {
         BTN_HELP,
         BTN_MODE,
         BTN_MIN,
+        BTN_HUD,
         ROW_CHECK,
         ROW_ICON,
         ROW_TEXT,
@@ -253,6 +261,10 @@ public final class TodoPanel {
         return px + pw - 35;
     }
 
+    private int btnHudX() {
+        return px + pw - 47;
+    }
+
     private int footerY() {
         return py + ph - FOOTER_H;
     }
@@ -285,6 +297,7 @@ public final class TodoPanel {
             if (inside(mx, my, btnMinX(), py + 1, 10, 10)) return new Hit(HitType.BTN_MIN, -1);
             if (inside(mx, my, btnModeX(), py + 1, 10, 10)) return new Hit(HitType.BTN_MODE, -1);
             if (inside(mx, my, btnHelpX(), py + 1, 10, 10)) return new Hit(HitType.BTN_HELP, -1);
+            if (inside(mx, my, btnHudX(), py + 1, 10, 10)) return new Hit(HitType.BTN_HUD, -1);
             return new Hit(HitType.HEADER, -1);
         }
 
@@ -383,18 +396,97 @@ public final class TodoPanel {
         scrollTo(j);
     }
 
-    /** Recounts how many of each goal item are in the inventory */
+    /** Recounts how many of each goal item you have (inventory, plus the open container if enabled) */
     private void recount() {
+        recount(mc().currentScreen instanceof GuiContainer ? (GuiContainer) mc().currentScreen : null);
+    }
+
+    private void recount(GuiContainer gui) {
         if (mc().thePlayer == null) return;
         ItemStack[] inv = mc().thePlayer.inventory.mainInventory;
+        List<ItemStack> extra = new ArrayList<>();
+        if (gui != null && TodoConfig.countOpenContainer
+            && !(gui instanceof GuiContainerCreative)
+            && gui.inventorySlots != null) {
+            for (Object o : gui.inventorySlots.inventorySlots) {
+                if (!(o instanceof Slot)) continue;
+                Slot slot = (Slot) o;
+                if (slot.inventory == mc().thePlayer.inventory || slot instanceof SlotCrafting) continue;
+                ItemStack s = slot.getStack();
+                if (s != null) extra.add(s);
+            }
+        }
         for (TodoEntry e : store.entries) {
             if (e.item == null) continue;
             int n = 0;
             for (ItemStack s : inv) {
                 if (s != null && countsAs(e.item, s)) n += s.stackSize;
             }
+            for (ItemStack s : extra) {
+                if (countsAs(e.item, s)) n += s.stackSize;
+            }
             e.have = n;
         }
+    }
+
+    /** Adds the crafting ingredients for the item of a row (amounts for the remaining goal) */
+    private void addIngredients(int idx) {
+        TodoEntry e = store.entries.get(idx);
+        if (e.item == null) return;
+        RecipeHelper.Recipe r = RecipeHelper.find(e.item);
+        if (r == null) {
+            showStatus(tr("inventorytodo.status.norecipe"));
+            return;
+        }
+        int goal = e.target > 0 ? e.target - Math.min(e.have, e.target) : 1;
+        if (goal <= 0) goal = Math.max(1, e.target);
+        int crafts = (goal + r.outputCount - 1) / r.outputCount;
+        int last = -1;
+        for (RecipeHelper.Ingredient in : r.ingredients) {
+            int amount = (int) Math.min(999_999_999L, (long) in.count * crafts);
+            int found = -1;
+            for (int i = 0; i < store.entries.size(); i++) {
+                if (sameItem(store.entries.get(i).item, in.stack)) {
+                    found = i;
+                    break;
+                }
+            }
+            if (found >= 0) {
+                TodoEntry ex = store.entries.get(found);
+                ex.target = (int) Math.min(999_999_999L, (long) ex.target + amount);
+                last = found;
+            } else {
+                store.entries.add(TodoEntry.item(in.stack, amount));
+                last = store.entries.size() - 1;
+            }
+        }
+        recount();
+        store.saveList();
+        if (last >= 0) flash(last);
+        showStatus(tr("inventorytodo.status.ingredients", e.displayText()));
+    }
+
+    private void showStatus(String s) {
+        status = s;
+        statusUntil = System.currentTimeMillis() + 2500;
+    }
+
+    // ---- HUD access ----
+
+    /** The current list (for the HUD) */
+    List<TodoEntry> entriesForHud() {
+        if (!uiLoaded) {
+            store.loadUi();
+            uiLoaded = true;
+        }
+        store.ensureLoaded();
+        return store.entries;
+    }
+
+    /** Recount while no screen is open (for the HUD) */
+    void refreshForHud() {
+        entriesForHud();
+        recount(null);
     }
 
     private static boolean countsAs(ItemStack target, ItemStack s) {
@@ -610,6 +702,19 @@ public final class TodoPanel {
             closeSearch();
             return true;
         }
+        int addKey = KeyBindings.ADD_HOVERED.getKeyCode();
+        if (addKey != 0 && key == addKey) {
+            int mx = Mouse.getX() * gui.width / mc().displayWidth;
+            int my = gui.height - Mouse.getY() * gui.height / mc().displayHeight - 1;
+            prepare(gui);
+            ItemStack s = insidePanel(mx, my) ? null
+                : Compat.get()
+                    .hoveredStack(gui, mx, my);
+            if (s != null) {
+                addItem(s, 0);
+                return true;
+            }
+        }
         return false;
     }
 
@@ -684,6 +789,9 @@ public final class TodoPanel {
                 }
                 store.saveUi();
                 break;
+            case BTN_HUD:
+                TodoConfig.setHudEnabled(!TodoConfig.hudEnabled);
+                break;
             case BTN_MIN:
                 commitEdit();
                 closeSearch();
@@ -698,7 +806,9 @@ public final class TodoPanel {
             }
             case ROW_ICON: {
                 ItemStack s = store.entries.get(h.index).item;
-                if (s != null && hasRecipeViewer() && (button == 0 || button == 1)) {
+                if (s != null && button == 0 && GuiScreen.isCtrlKeyDown()) {
+                    addIngredients(h.index);
+                } else if (s != null && hasRecipeViewer() && (button == 0 || button == 1)) {
                     Compat.get()
                         .showRecipes(s, button == 1);
                 }
@@ -927,6 +1037,13 @@ public final class TodoPanel {
             case BTN_MIN:
                 tip.add(tr("inventorytodo.tip.minimize"));
                 break;
+            case BTN_HUD:
+                tip.add(
+                    tr(
+                        "inventorytodo.tip.hud",
+                        tr(TodoConfig.hudEnabled ? "inventorytodo.state.on" : "inventorytodo.state.off")));
+                tip.add(EnumChatFormatting.GRAY + tr("inventorytodo.tip.hud.desc"));
+                break;
             case BTN_MODE:
                 tip.add(
                     tr(
@@ -945,6 +1062,8 @@ public final class TodoPanel {
                 addHelp(tip, "inventorytodo.help.wheel");
                 addHelp(tip, "inventorytodo.help.auto");
                 if (hasRecipeViewer()) addHelp(tip, "inventorytodo.help.recipe");
+                addHelp(tip, "inventorytodo.help.ingredients");
+                addHelp(tip, "inventorytodo.help.hud");
                 addHelp(tip, "inventorytodo.help.reorder");
                 addHelp(tip, "inventorytodo.help.move");
                 break;
@@ -992,6 +1111,7 @@ public final class TodoPanel {
                     EnumChatFormatting.AQUA
                         + tr("inventorytodo.tip.progress", e.have, e.target > 0 ? String.valueOf(e.target) : "-"));
                 if (hasRecipeViewer()) tip.add(EnumChatFormatting.DARK_GRAY + tr("inventorytodo.tip.row.icon"));
+                tip.add(EnumChatFormatting.DARK_GRAY + tr("inventorytodo.tip.row.ingredients"));
                 tip.add(EnumChatFormatting.DARK_GRAY + tr("inventorytodo.tip.row.count"));
             }
         } else if (searchOpen && h.type == HitType.SEARCH_RESULT) {
@@ -1057,7 +1177,9 @@ public final class TodoPanel {
         // header
         int done = store.entries.size() - remainingCount();
         String title = tr("inventorytodo.title") + " " + EnumChatFormatting.GRAY + done + "/" + store.entries.size();
-        fr.drawStringWithShadow(fr.trimStringToWidth(title, pw - 40), px + 3, py + 2, C_TEXT);
+        fr.drawStringWithShadow(fr.trimStringToWidth(title, pw - 52), px + 3, py + 2, C_TEXT);
+        drawButton(btnHudX(), py + 1, 10, 10, tr("inventorytodo.btn.hud.short"), mx, my);
+        if (TodoConfig.hudEnabled) Gui.drawRect(btnHudX() + 1, py + 10, btnHudX() + 9, py + 11, 0xFF55FF55);
         drawButton(btnHelpX(), py + 1, 10, 10, "?", mx, my);
         drawButton(
             btnModeX(),
@@ -1084,6 +1206,12 @@ public final class TodoPanel {
         } else {
             drawButton(px + ADD_TEXT_X, fy + 1, ADD_TEXT_W, 12, tr("inventorytodo.btn.addtext"), mx, my);
             drawButton(px + ADD_ITEM_X, fy + 1, ADD_ITEM_W, 12, tr("inventorytodo.btn.additem"), mx, my);
+            if (status != null && System.currentTimeMillis() < statusUntil) {
+                // drawn just above the footer so the buttons do not cut it off
+                String s = fr.trimStringToWidth(status, pw - 6);
+                Gui.drawRect(px, fy - 11, px + pw, fy, 0xE0303050);
+                fr.drawStringWithShadow(s, px + 3, fy - 10, 0xFFFF80);
+            }
             if (store.entries.size() > rowsVisible) {
                 String s = (scroll + 1) + "-"
                     + Math.min(store.entries.size(), scroll + rowsVisible)
@@ -1216,7 +1344,7 @@ public final class TodoPanel {
     private static void drawItem(int x, int y, ItemStack stack) {
         try {
             Compat.get()
-                .drawItem(x, y, stack);
+                .drawItem(x, y, TodoEntry.renderable(stack));
         } catch (Throwable t) {
             // one broken item must not stop the whole panel
         } finally {

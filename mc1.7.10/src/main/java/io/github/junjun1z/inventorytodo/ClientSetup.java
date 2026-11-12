@@ -1,10 +1,9 @@
 package io.github.junjun1z.inventorytodo;
 
+import cpw.mods.fml.common.Loader;
 import io.github.junjun1z.inventorytodo.compat.Compat;
 import io.github.junjun1z.inventorytodo.compat.GuiEvents;
 import io.github.junjun1z.inventorytodo.compat.VanillaFrontend;
-
-import cpw.mods.fml.common.Loader;
 
 /** Client initialisation: picks the input/render frontend depending on which mods are installed. */
 public final class ClientSetup {
@@ -13,6 +12,8 @@ public final class ClientSetup {
 
     public static void init() {
         GuiEvents.register();
+        KeyBindings.register();
+        TodoHud.register();
         if (Loader.isModLoaded("NotEnoughItems")) {
             try {
                 // Loaded by name so that NEI classes are never touched when NEI is absent.

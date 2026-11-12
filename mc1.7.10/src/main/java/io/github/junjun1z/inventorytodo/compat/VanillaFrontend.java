@@ -15,12 +15,11 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import io.github.junjun1z.inventorytodo.TodoPanel;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import io.github.junjun1z.inventorytodo.TodoPanel;
 
 /**
  * Standalone frontend (no NEI).
