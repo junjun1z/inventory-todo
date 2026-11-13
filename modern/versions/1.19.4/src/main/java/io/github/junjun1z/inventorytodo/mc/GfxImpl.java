@@ -15,13 +15,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import io.github.junjun1z.inventorytodo.core.Gfx;
 
-/** {@link Gfx} for 1.19.x and older (PoseStack + GuiComponent). Tooltips need the current screen. */
+/** {@link Gfx} for 1.19.4 (PoseStack + GuiComponent). Tooltips need the current screen. */
 public class GfxImpl implements Gfx {
 
     private final PoseStack pose;
     private final Screen screen;
     private final Font font = Minecraft.getInstance().font;
-    private float z;
 
     public GfxImpl(PoseStack pose, Screen screen) {
         this.pose = pose;
@@ -53,16 +52,12 @@ public class GfxImpl implements Gfx {
     public void item(Object stack, int x, int y) {
         ItemStack st = (ItemStack) stack;
         ItemRenderer ir = Minecraft.getInstance().getItemRenderer();
-        float old = ir.blitOffset;
-        ir.blitOffset = z + 100;
-        ir.renderAndDecorateItem(st, x, y);
-        ir.renderGuiItemDecorations(font, st, x, y);
-        ir.blitOffset = old;
+        ir.renderAndDecorateItem(pose, st, x, y);
+        ir.renderGuiItemDecorations(pose, font, st, x, y);
     }
 
     @Override
     public void raise() {
-        z += 300;
         pose.translate(0, 0, 300);
     }
 

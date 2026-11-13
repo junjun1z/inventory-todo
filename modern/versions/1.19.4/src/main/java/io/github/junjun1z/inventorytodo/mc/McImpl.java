@@ -106,8 +106,7 @@ public class McImpl implements Mc {
     public String englishName(Object stack) {
         if (english == null && !englishFailed) {
             try {
-                english = ClientLanguage.loadFrom(mc().getResourceManager(), Collections.singletonList(mc().getLanguageManager()
-                    .getLanguage("en_us")));
+                english = ClientLanguage.loadFrom(mc().getResourceManager(), Collections.singletonList("en_us"), false);
             } catch (Throwable t) {
                 englishFailed = true;
                 Log.warn("English names unavailable: " + t);
@@ -130,7 +129,7 @@ public class McImpl implements Mc {
         List<Object> out = new ArrayList<>();
         Minecraft mc = mc();
         try {
-            if (mc.player != null) CreativeModeTabs.tryRebuildTabContents(mc.player.connection.enabledFeatures(), true);
+            if (mc.player != null) CreativeModeTabs.tryRebuildTabContents(mc.player.connection.enabledFeatures(), true, mc.player.level.registryAccess());
             out.addAll(CreativeModeTabs.SEARCH.getDisplayItems());
         } catch (Throwable t) {
             Log.debug("creative search tab unavailable: " + t);
