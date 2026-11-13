@@ -5,7 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.client.event.AddGuiOverlayLayersEvent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -23,7 +24,7 @@ import io.github.junjun1z.inventorytodo.mc.GfxImpl;
 import io.github.junjun1z.inventorytodo.mc.McImpl;
 import io.github.junjun1z.inventorytodo.mc.ScreenAccess;
 
-/** Client-side wiring through Forge's screen events (no mixins). */
+/** Client-side wiring through Forge's screen events (no mixins). Forge 1.21 - 1.21.5 (EventBus 6). */
 public final class ForgeClient {
 
     static final KeyMapping HUD_KEY = new KeyMapping("inventorytodo.key.togglehud", InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), "inventorytodo.key.category");
@@ -92,8 +93,7 @@ public final class ForgeClient {
             PANEL.render(e.getScreen(), new GfxImpl(g), e.getMouseX(), e.getMouseY());
             g.pose().popPose();
         });
-        bus.addListener((TickEvent.ClientTickEvent e) -> {
-            if (e.phase != TickEvent.Phase.END) return;
+        bus.addListener((TickEvent.ClientTickEvent.Post e) -> {
             Core.clientTick();
             Minecraft mc = Minecraft.getInstance();
             while (HUD_KEY.consumeClick()) Hud.toggle();
@@ -101,9 +101,10 @@ public final class ForgeClient {
             if (mc.screen instanceof AbstractContainerScreen) PANEL.tick(mc.screen);
             else if (mc.screen == null) Hud.tick();
         });
-        bus.addListener((RenderGuiEvent.Post e) -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.screen == null && !mc.options.hideGui) Hud.render(new GfxImpl(e.getGuiGraphics()));
-        });
+        modBus.addListener((AddGuiOverlayLayersEvent e) -> e.getLayeredDraw()
+            .add(ResourceLocation.fromNamespaceAndPath(Core.MODID, "todo_hud"), (g, delta) -> {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.screen == null && !mc.options.hideGui) Hud.render(new GfxImpl(g));
+            }));
     }
 }

@@ -11,7 +11,7 @@ import io.github.junjun1z.inventorytodo.core.Core;
 @Mod(Core.MODID)
 public class InventoryTodoForge {
 
-    public InventoryTodoForge() {
-        if (FMLEnvironment.dist == Dist.CLIENT) ForgeClient.init(FMLJavaModLoadingContext.get().getModEventBus());
+    public InventoryTodoForge(FMLJavaModLoadingContext context) {
+        if (FMLEnvironment.dist == Dist.CLIENT) ForgeClient.init(context.getModEventBus());
     }
 }
