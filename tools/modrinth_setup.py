@@ -39,18 +39,16 @@ LINKS = {
 
 # Nice titles for known screenshot file names (others use the file name)
 GALLERY_TITLES = {
-    "panel": "The ToDo panel next to the inventory",
-    "search": "Search items by name or ID",
-    "hud": "HUD while playing",
-    "ingredients": "Recipe ingredients added in one click",
-    "minimized": "Minimized to an icon",
-    "modern-26.3-fabric-panel": "The ToDo panel next to the inventory (26.3 Fabric)",
-    "modern-26.3-fabric-hud": "HUD of unfinished tasks while playing",
-    "modern-26.3-fabric-item-search": "Search items by name or ID",
-    "modern-26.3-fabric-row-menu": "Right-click a row for more options",
-    "modern-26.3-fabric-settings": "In-game settings",
-    "modern-1.20.1-forge-panel": "Same panel on 1.20.1 Forge",
-    "modern-1.21.1-neoforge-panel": "Same panel on 1.21.1 NeoForge",
+    "inventory-panel": "The ToDo panel next to the inventory: notes and item goals that count up",
+    "chest-counting": "Open containers count too: the chest's glass and iron are included",
+    "hud": "HUD of unfinished tasks while exploring",
+    "item-search": "Search items by name or ID",
+    "row-menu": "Right-click a row for more options",
+    "recipe-ingredients": "Ctrl+click an item to add its recipe ingredients",
+    "jei": "Add items straight from JEI's list",
+    "minimized": "Minimized to a small icon with the number of open tasks",
+    "settings": "In-game settings",
+    "nei-gtnh": "Minecraft 1.7.10 in GT New Horizons, with NEI",
 }
 
 
@@ -159,7 +157,7 @@ def icon(s, dry):
     print("Icon uploaded")
 
 
-FEATURED = "modern-26.3-fabric-panel"
+FEATURED = "01_inventory-panel"
 
 
 def gallery(s, dry, replace=False):
