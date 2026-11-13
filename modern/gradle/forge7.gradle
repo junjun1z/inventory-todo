@@ -13,3 +13,8 @@ repositories {
 dependencies {
     implementation minecraft.dependency("net.minecraftforge:forge:${project.property('mc_version')}-${project.property('forge_version')}")
 }
+
+dependencies {
+    def extra = rootProject.file("../gradle/deps-forge7-${project.property('code_version')}.gradle")
+    if (extra.exists()) apply from: extra, to: project
+}

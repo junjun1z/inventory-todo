@@ -44,6 +44,7 @@ in `modern/` build it automatically; `-Ptargets=` and `-Pmod_version=` apply to 
 | `1.15.2-forge`, `1.14.4-forge` | Architectury Loom (official mappings, remapped to SRG) |
 | `1.20.6-forge` | ForgeGradle 7 (Forge 1.20.6 runs on Mojang names: no reobfuscation) |
 | `1.20.2-forge`, `1.20.4-forge` | ForgeGradle 7, then ForgeAutoRenamingTool renames the jar to SRG names (`gradle/forge7_srg.gradle`) |
+| `1.21.1-forge` … `1.21.11-forge`, `26.1.2-forge`, `26.2-forge` | ForgeGradle 7 (Forge 1.20.6+ runs on Mojang names: no reobfuscation) |
 
 Its jars: `modern/legacy/targets/<mc>-forge/build/libs/inventorytodo-forge-<mc>-<version>.jar`.
 Java 8 toolchains (1.12.2 / 1.16.5) are downloaded automatically like the others.

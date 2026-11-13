@@ -17,6 +17,39 @@ public class DevPlatformImpl implements DevPlatform {
         return Minecraft.getInstance();
     }
 
+    // 26.2 moved screen / toasts / chat into Minecraft.gui; 26.1 still has them on Minecraft (reflection: one devtest for all 26.x)
+    private static void setScreen(net.minecraft.client.gui.screens.Screen s) {
+        try {
+            Object gui = Minecraft.class.getField("gui").get(mc());
+            try {
+                gui.getClass().getMethod("setScreen", net.minecraft.client.gui.screens.Screen.class).invoke(gui, s);
+                return;
+            } catch (NoSuchMethodException e) {
+                Minecraft.class.getMethod("setScreen", net.minecraft.client.gui.screens.Screen.class).invoke(mc(), s);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Follows a dotted path of fields / no-arg methods; tries each alternative path in turn */
+    private static Object call(Object root, String... paths) {
+        for (String path : paths) {
+            try {
+                Object o = root;
+                for (String name : path.split("\\.")) {
+                    try {
+                        o = o.getClass().getField(name).get(o);
+                    } catch (NoSuchFieldException e) {
+                        o = o.getClass().getMethod(name).invoke(o);
+                    }
+                }
+                return o;
+            } catch (Exception ignored) {}
+        }
+        throw new IllegalStateException("none of " + String.join(", ", paths));
+    }
+
     @Override
     public boolean inWorld() {
         return mc().player != null && mc().level != null;
@@ -24,17 +57,17 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public Object screen() {
-        return mc().gui.screen();
+        return io.github.junjun1z.inventorytodo.mc.McImpl.currentScreen();
     }
 
     @Override
     public void openInventory() {
-        mc().gui.setScreen(new InventoryScreen(mc().player));
+        setScreen(new InventoryScreen(mc().player));
     }
 
     @Override
     public void closeScreen() {
-        mc().gui.setScreen(null);
+        setScreen(null);
     }
 
     @Override
@@ -49,7 +82,7 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public void screenshot(String name) {
-        Screenshot.grab(mc().gameDirectory, name + ".png", mc().gameRenderer.mainRenderTarget(), 1, msg -> {});
+        Screenshot.grab(mc().gameDirectory, name + ".png", (com.mojang.blaze3d.pipeline.RenderTarget) call(mc(), "gameRenderer.mainRenderTarget", "getMainRenderTarget"), 1, msg -> {});
     }
 
     @Override
@@ -74,7 +107,7 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public String versionName() {
-        return "26.3";
+        return net.minecraft.SharedConstants.getCurrentVersion().name();
     }
 
     @Override
@@ -111,8 +144,8 @@ public class DevPlatformImpl implements DevPlatform {
     @Override
     public void clearOverlays() {
         try {
-            mc().gui.toastManager().clear();
-            mc().gui.hud.getChat().clearMessages(false);
+            ((net.minecraft.client.gui.components.toasts.ToastManager) call(mc(), "gui.toastManager", "getToastManager")).clear();
+            ((net.minecraft.client.gui.components.ChatComponent) call(mc(), "gui.hud.getChat", "gui.getChat")).clearMessages(false);
         } catch (Throwable t) {
             io.github.junjun1z.inventorytodo.core.Log.warn("clearOverlays: " + t);
         }

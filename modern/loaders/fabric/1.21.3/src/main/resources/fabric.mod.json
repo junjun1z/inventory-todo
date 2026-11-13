@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": ["${mod_authors}"],
+  "contact": { "homepage": "${mod_homepage}", "sources": "${mod_homepage}", "issues": "${mod_issues}" },
+  "license": "${mod_license}",
+  "icon": "assets/inventorytodo/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["io.github.junjun1z.inventorytodo.fabric.InventoryTodoFabric"],
+    "jei_mod_plugin": ["io.github.junjun1z.inventorytodo.mc.JeiCompat"]
+  },
+  "mixins": ["inventorytodo.mixins.json"],
+  "accessWidener": "inventorytodo.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.15",
+    "fabric-api": "*",
+    "minecraft": "${mc_range}",
+    "java": ">=${java_version}"
+  },
+  "suggests": { "emi": "*", "jei": "*", "roughlyenoughitems": "*" }
+}
