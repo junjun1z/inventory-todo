@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[48,)"
+license = "${mod_license}"
+issueTrackerURL = "${mod_issues}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+displayURL = "${mod_homepage}"
+logoFile = "assets/inventorytodo/icon.png"
+description = '''${mod_description}'''
+# Client-side only: servers and other players don't need it
+displayTest = "IGNORE_ALL_VERSION"
+
+[[dependencies.${mod_id}]]
+modId = "forge"
+mandatory = true
+versionRange = "${loader_range}"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+mandatory = true
+versionRange = "${mc_range}"
+ordering = "NONE"
+side = "CLIENT"
