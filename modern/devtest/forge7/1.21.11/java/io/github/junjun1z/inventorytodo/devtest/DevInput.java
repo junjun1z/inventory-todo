@@ -21,6 +21,6 @@ public class DevInput implements DevInputApi {
 
     @Override
     public boolean character(Object screen, char c) {
-        return ScreenEvent.CharacterTyped.Pre.BUS.post(new ScreenEvent.CharacterTyped.Pre((Screen) screen, new CharacterEvent(c)));
+        return ScreenEvent.CharacterTyped.Pre.BUS.post(new ScreenEvent.CharacterTyped.Pre((Screen) screen, new CharacterEvent(c, 0)));
     }
 }
