@@ -63,7 +63,7 @@ public class GfxImpl implements Gfx {
         ItemStack st = (ItemStack) stack;
         ItemRenderer ir = Minecraft.getInstance().getItemRenderer();
         float old = ir.blitOffset;
-        ir.blitOffset = z + 100;
+        ir.blitOffset = 100; // raise() already moved the GL matrix
         RenderSystem.enableDepthTest();
         ir.renderAndDecorateItem(st, x, y);
         ir.renderGuiItemDecorations(font, st, x, y);
