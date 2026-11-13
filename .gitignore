@@ -7,3 +7,4 @@ out/
 .vscode/
 .secrets/
 *.token
+.claude/
