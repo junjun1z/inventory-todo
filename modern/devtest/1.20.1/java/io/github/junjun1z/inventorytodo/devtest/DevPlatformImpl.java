@@ -74,7 +74,7 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public String versionName() {
-        return "1.20.1";
+        return net.minecraft.SharedConstants.getCurrentVersion().getName();
     }
 
     @Override

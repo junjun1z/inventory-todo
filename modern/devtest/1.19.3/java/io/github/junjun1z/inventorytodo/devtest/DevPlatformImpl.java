@@ -74,7 +74,7 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public String versionName() {
-        return "1.19.3";
+        return net.minecraft.SharedConstants.getCurrentVersion().getName();
     }
 
     @Override
@@ -92,5 +92,10 @@ public class DevPlatformImpl implements DevPlatform {
             p.getInventory().clearContent();
             p.inventoryMenu.broadcastChanges();
         });
+    }
+
+    @Override
+    public void loadWorld(String folder) {
+        mc().createWorldOpenFlows().loadLevel(mc().screen, folder);
     }
 }
