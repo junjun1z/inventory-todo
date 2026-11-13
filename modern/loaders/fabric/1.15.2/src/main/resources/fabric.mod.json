@@ -16,6 +16,7 @@
   "accessWidener": "inventorytodo.accesswidener",
   "depends": {
     "fabricloader": ">=0.12",
+    "fabric": "*",
     "minecraft": "${mc_range}",
     "java": ">=${java_version}"
   },

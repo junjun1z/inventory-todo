@@ -15,7 +15,7 @@ import io.github.junjun1z.inventorytodo.mc.ScreenAccess;
 
 /**
  * Fabric entry point (client only). Fabric API for these versions has no screen events, so everything is
- * wired through small mixins ({@link FabricHooks}); the mod needs nothing but Fabric Loader.
+ * wired through small mixins ({@link FabricHooks}). Fabric API is needed only to load the resources (translations).
  */
 public class InventoryTodoFabric implements ClientModInitializer {
 
