@@ -1,0 +1,13 @@
+[{
+  "modid": "inventorytodo",
+  "name": "Inventory ToDo",
+  "description": "${mod_description}",
+  "version": "${version}",
+  "mcversion": "${mc_version}",
+  "url": "${mod_homepage}",
+  "authorList": ["${mod_authors}"],
+  "logoFile": "assets/inventorytodo/icon.png",
+  "requiredMods": [],
+  "dependencies": [],
+  "useDependencyInformation": false
+}]
