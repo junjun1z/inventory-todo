@@ -96,6 +96,15 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public void loadWorld(String folder) {
-        mc().loadLevel(folder);
+        if (mc().getLevelSource().levelExists(folder)) {
+            mc().loadLevel(folder);
+            return;
+        }
+        // no test world yet: create one (creative, peaceful)
+        net.minecraft.core.RegistryAccess.RegistryHolder reg = net.minecraft.core.RegistryAccess.builtin();
+        net.minecraft.world.level.LevelSettings ls = new net.minecraft.world.level.LevelSettings(folder, net.minecraft.world.level.GameType.CREATIVE, false,
+            net.minecraft.world.Difficulty.PEACEFUL, true, new net.minecraft.world.level.GameRules(), net.minecraft.world.level.DataPackConfig.DEFAULT);
+        mc().createLevel(folder, ls, reg, net.minecraft.world.level.levelgen.WorldGenSettings.makeDefault(reg.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY),
+            reg.registryOrThrow(Registry.BIOME_REGISTRY), reg.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY)));
     }
 }
