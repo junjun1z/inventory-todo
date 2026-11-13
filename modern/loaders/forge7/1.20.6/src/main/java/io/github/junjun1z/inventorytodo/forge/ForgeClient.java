@@ -3,9 +3,10 @@ package io.github.junjun1z.inventorytodo.forge;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.client.event.AddGuiOverlayLayersEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -72,7 +73,7 @@ public final class ForgeClient {
             if (PANEL.mouseReleased(e.getScreen(), e.getMouseX(), e.getMouseY(), e.getButton())) e.setCanceled(true);
         });
         bus.addListener(EventPriority.HIGHEST, (ScreenEvent.MouseScrolled.Pre e) -> {
-            double d = e.getScrollDelta();
+            double d = e.getDeltaY();
             if (d != 0 && PANEL.mouseScrolled(e.getScreen(), e.getMouseX(), e.getMouseY(), d > 0 ? 1 : -1)) e.setCanceled(true);
         });
         bus.addListener(EventPriority.HIGHEST, (ScreenEvent.KeyPressed.Pre e) -> {
@@ -101,9 +102,11 @@ public final class ForgeClient {
             if (mc.screen instanceof AbstractContainerScreen) PANEL.tick(mc.screen);
             else if (mc.screen == null) Hud.tick();
         });
-        bus.addListener((RenderGuiEvent.Post e) -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.screen == null && !mc.options.hideGui) Hud.render(new GfxImpl(e.getGuiGraphics()));
-        });
+        // HUD: a layer of the in-game overlay (1.20.6 Forge has no RenderGuiEvent)
+        modBus.addListener((AddGuiOverlayLayersEvent e) -> e.getLayeredDraw()
+            .add(new ResourceLocation(Core.MODID, "todo_hud"), (g, delta) -> {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.screen == null && !mc.options.hideGui) Hud.render(new GfxImpl(g));
+            }));
     }
 }
