@@ -49,7 +49,12 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public void screenshot(String name) {
-        Screenshot.grab(mc().gameDirectory, name + ".png", mc().getMainRenderTarget(), msg -> {});
+        try {
+            Screenshot.grab(mc().gameDirectory, name + ".png", mc().getMainRenderTarget(), msg -> {});
+        } catch (NoSuchMethodError e) {
+            // 1.17 (not .1) has another signature; screenshots are optional for the test
+            io.github.junjun1z.inventorytodo.core.Log.warn("screenshot unavailable: " + e);
+        }
     }
 
     @Override
