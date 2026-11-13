@@ -37,7 +37,7 @@ public class DevPlatformImpl implements DevPlatform {
         for (String path : paths) {
             try {
                 Object o = root;
-                for (String name : path.split("\.")) {
+                for (String name : path.split("\\.")) {
                     try {
                         o = o.getClass().getField(name).get(o);
                     } catch (NoSuchFieldException e) {
