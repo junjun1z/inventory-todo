@@ -32,17 +32,63 @@ Client-side only: not needed on servers, and you can join servers without it.
 | Minecraft | Loaders |
 | --- | --- |
 | 26.3 | Forge, NeoForge, Fabric |
-| 26.2 | NeoForge, Fabric |
-| 26.1.2 | NeoForge, Fabric |
+| 26.2 | Forge, NeoForge, Fabric |
+| 26.1.2 | Forge, NeoForge, Fabric |
 | 26.1.1 | NeoForge, Fabric |
 | 26.1 | NeoForge, Fabric |
-| 1.21.11 | NeoForge, Fabric |
-| 1.21.1 | NeoForge, Fabric |
-| 1.20.1 | Forge, Fabric |
+| 1.21.11 | Forge, NeoForge, Fabric |
+| 1.21.10 | Forge, NeoForge, Fabric |
+| 1.21.9 | Forge, Fabric |
+| 1.21.8 | Forge, NeoForge, Fabric |
+| 1.21.7 | Fabric |
+| 1.21.6 | Fabric |
+| 1.21.5 | Forge, NeoForge, Fabric |
+| 1.21.4 | Forge, NeoForge, Fabric |
+| 1.21.3 | Forge, NeoForge, Fabric |
+| 1.21.2 | Fabric |
+| 1.21.1 | Forge, NeoForge, Fabric |
+| 1.21 | NeoForge, Fabric |
+| 1.20.6 | Forge, NeoForge, Fabric |
+| 1.20.5 | Fabric |
+| 1.20.4 | Forge, NeoForge, Fabric |
+| 1.20.3 | Forge, Fabric |
+| 1.20.2 | Forge, Fabric |
+| 1.20.1 | Forge, NeoForge, Fabric |
+| 1.20 | Forge, NeoForge, Fabric |
+| 1.19.4 | Forge, Fabric |
+| 1.19.3 | Forge, Fabric |
 | 1.19.2 | Forge, Fabric |
+| 1.19.1 | Forge, Fabric |
+| 1.19 | Forge, Fabric |
 | 1.18.2 | Forge, Fabric |
+| 1.18.1 | Forge, Fabric |
+| 1.18 | Forge, Fabric |
+| 1.17.1 | Forge, Fabric |
+| 1.17 | Fabric |
 | 1.16.5 | Forge, Fabric |
+| 1.16.4 | Forge, Fabric |
+| 1.16.3 | Forge, Fabric |
+| 1.16.2 | Fabric |
+| 1.16.1 | Fabric |
+| 1.16 | Fabric |
+| 1.15.2 | Forge, Fabric |
+| 1.15.1 | Forge, Fabric |
+| 1.15 | Fabric |
+| 1.14.4 | Forge, Fabric |
+| 1.14.3 | Fabric |
+| 1.14.2 | Fabric |
+| 1.14.1 | Fabric |
+| 1.14 | Fabric |
 | 1.12.2 | Forge |
+| 1.12.1 | Forge |
+| 1.12 | Forge |
+| 1.11.2 | Forge |
+| 1.11 | Forge |
+| 1.10.2 | Forge |
+| 1.10 | Forge |
+| 1.9.4 | Forge |
+| 1.9 | Forge |
+| 1.8.9 | Forge |
 | 1.7.10 | Forge |
 <!-- support-table:end -->
 
@@ -51,7 +97,7 @@ Client-side only: not needed on servers, and you can join servers without it.
 | Mod | What you get |
 | --- | --- |
 | NEI (original or GTNH fork) | Modifier+click / drag & drop from the item list, recipes/usages on icon click, NEI keys over list items |
-| JEI (1.20.1+) / EMI / REI | Hovered-item adding, drag & drop, recipes/usages on icon click |
+| JEI (1.18+) / EMI / REI | Hovered-item adding, drag & drop, recipes/usages on icon click |
 
 ## FAQ
 

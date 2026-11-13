@@ -358,7 +358,6 @@
           "fabric-api"
         ],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -378,7 +377,6 @@
       "dependencies": {
         "required": [],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -398,7 +396,6 @@
       "dependencies": {
         "required": [],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -496,7 +493,6 @@
           "fabric-api"
         ],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -514,7 +510,6 @@
       "dependencies": {
         "required": [],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -535,7 +530,6 @@
           "fabric-api"
         ],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -557,7 +551,6 @@
           "fabric-api"
         ],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -576,7 +569,6 @@
       "dependencies": {
         "required": [],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -600,7 +592,6 @@
           "fabric-api"
         ],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
@@ -618,7 +609,6 @@
       "dependencies": {
         "required": [],
         "optional": [
-          "jei",
           "emi",
           "rei"
         ]
