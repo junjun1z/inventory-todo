@@ -28,8 +28,8 @@ import io.github.junjun1z.inventorytodo.core.TodoPanel;
 import io.github.junjun1z.inventorytodo.mc.GfxImpl;
 import io.github.junjun1z.inventorytodo.mc.McImpl;
 
-/** Forge 1.10.2 entry point. Client only (not needed on servers). Uses Forge's GUI input events, no coremod. */
-@Mod(modid = Core.MODID, name = "Inventory ToDo", useMetadata = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.10.2]", acceptableRemoteVersions = "*")
+/** Forge 1.10 - 1.10.2 entry point. Client only (not needed on servers). Uses Forge's GUI input events, no coremod. */
+@Mod(modid = Core.MODID, name = "Inventory ToDo", useMetadata = true, clientSideOnly = true, acceptedMinecraftVersions = "[1.10,1.10.2]", acceptableRemoteVersions = "*")
 public class InventoryTodoForge {
 
     static final KeyBinding HUD_KEY = new KeyBinding("inventorytodo.key.togglehud", 0, "inventorytodo.key.category");

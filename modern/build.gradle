@@ -31,3 +31,11 @@ tasks.register('clean') {
     group = 'build'
     dependsOn gradle.includedBuild('legacy').task(':clean')
 }
+
+// Nested oldforge build (MinecraftForge 1.8.9 - 1.11.2 through Unimined): part of build / clean / collectJars
+tasks.named('build') { dependsOn gradle.includedBuild('oldforge').task(':build') }
+tasks.named('clean') { dependsOn gradle.includedBuild('oldforge').task(':clean') }
+tasks.named('collectJars', Sync) {
+    dependsOn gradle.includedBuild('oldforge').task(':build')
+    from(fileTree('oldforge/targets') { include "*/build/libs/inventorytodo-*-${distVersion}.jar" })
+}

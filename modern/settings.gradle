@@ -28,3 +28,6 @@ targets.each { t ->
 
 // MinecraftForge before 1.17 (Architectury Loom) lives in a nested build with its own plugin classpath
 includeBuild('legacy')
+
+// MinecraftForge 1.8.9 - 1.11.2 (Unimined) lives in another nested build with its own plugin classpath
+includeBuild('oldforge')
