@@ -42,6 +42,7 @@ in `modern/` build it automatically; `-Ptargets=` and `-Pmod_version=` apply to 
 | `1.12.2-forge` | RetroFuturaGradle (MCP names, reobfuscated) |
 | `26.3-forge` | ForgeGradle 7 |
 | `1.20.6-forge` | ForgeGradle 7 (Forge 1.20.6 runs on Mojang names: no reobfuscation) |
+| `1.20.2-forge`, `1.20.4-forge` | ForgeGradle 7, then ForgeAutoRenamingTool renames the jar to SRG names (`gradle/forge7_srg.gradle`) |
 
 Its jars: `modern/legacy/targets/<mc>-forge/build/libs/inventorytodo-forge-<mc>-<version>.jar`.
 Java 8 toolchains (1.12.2 / 1.16.5) are downloaded automatically like the others.
