@@ -44,6 +44,13 @@ GALLERY_TITLES = {
     "hud": "HUD while playing",
     "ingredients": "Recipe ingredients added in one click",
     "minimized": "Minimized to an icon",
+    "modern-26.3-fabric-panel": "The ToDo panel next to the inventory (26.3 Fabric)",
+    "modern-26.3-fabric-hud": "HUD of unfinished tasks while playing",
+    "modern-26.3-fabric-item-search": "Search items by name or ID",
+    "modern-26.3-fabric-row-menu": "Right-click a row for more options",
+    "modern-26.3-fabric-settings": "In-game settings",
+    "modern-1.20.1-forge-panel": "Same panel on 1.20.1 Forge",
+    "modern-1.21.1-neoforge-panel": "Same panel on 1.21.1 NeoForge",
 }
 
 
@@ -152,10 +159,23 @@ def icon(s, dry):
     print("Icon uploaded")
 
 
-def gallery(s, dry):
+FEATURED = "modern-26.3-fabric-panel"
+
+
+def gallery(s, dry, replace=False):
     p = get_project(s) or sys.exit("Project not found; run --create first")
+    if replace:
+        for g in p.get("gallery", []):
+            if dry:
+                print("(dry-run) gallery -", g.get("title"))
+                continue
+            r = s.delete("%s/project/%s/gallery" % (API, p["id"]), params={"url": g["url"]}, timeout=60)
+            check(r, "Gallery delete " + str(g.get("title")))
+            print("gallery -", g.get("title"))
+        p["gallery"] = []
     have = {g.get("title") for g in p.get("gallery", [])}
-    images = sorted(glob.glob(os.path.join(ROOT, "docs", "screenshots", "*.png")))
+    images = sorted(glob.glob(os.path.join(ROOT, "docs", "screenshots", "*.png")),
+                    key=lambda x: (FEATURED not in x, x))
     if not images:
         print("No images in docs/screenshots/")
         return
@@ -166,7 +186,7 @@ def gallery(s, dry):
         if title in have:
             print("skip (already in gallery):", title)
             continue
-        params = {"ext": "png", "featured": "true" if i == 0 and not have else "false",
+        params = {"ext": "png", "featured": "true" if i == 0 and not have and FEATURED in path else "false",
                   "title": title, "ordering": str(i)}
         if dry:
             print("(dry-run) gallery +", os.path.basename(path), params)
@@ -207,6 +227,7 @@ def status(s):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--replace", action="store_true", help="with --gallery: delete the current gallery first")
     for a in ("create", "update", "icon", "gallery", "submit", "status"):
         ap.add_argument("--" + a, action="store_true")
     ap.add_argument("--dry-run", action="store_true")
@@ -219,7 +240,7 @@ def main():
     if args.icon:
         icon(s, args.dry_run)
     if args.gallery:
-        gallery(s, args.dry_run)
+        gallery(s, args.dry_run, args.replace)
     if args.submit:
         submit(s, args.dry_run)
     if args.status or not any(vars(args)[k] for k in ("create", "update", "icon", "gallery", "submit")):
