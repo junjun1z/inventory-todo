@@ -42,7 +42,7 @@ public class DevPlatformImpl implements DevPlatform {
         MinecraftServer server = mc().getSingleplayerServer();
         server.execute(() -> {
             ServerPlayer p = server.getPlayerList().getPlayers().get(0);
-            p.getInventory().add(new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(id)), count));
+            p.getInventory().add(new ItemStack(BuiltInRegistries.ITEM.getValue(ResourceLocation.parse(id)), count));
             p.inventoryMenu.broadcastChanges();
         });
     }
@@ -109,7 +109,7 @@ public class DevPlatformImpl implements DevPlatform {
     @Override
     public void clearOverlays() {
         try {
-            mc().getToasts().clear();
+            mc().getToastManager().clear();
             mc().gui.getChat().clearMessages(false);
         } catch (Throwable t) {
             io.github.junjun1z.inventorytodo.core.Log.warn("clearOverlays: " + t);
