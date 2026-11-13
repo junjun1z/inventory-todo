@@ -69,3 +69,20 @@ differs, add `versions/<code_version>` and `loaders/<loader>/<code_version>` and
 Put the jar into an instance, create `config/inventorytodo/selftest.flag`, launch straight into a world
 (`prismlauncher --launch <instance> --world <world>`). The test drives the panel (also with real mouse/keyboard
 input through `java.awt.Robot`), saves screenshots and `selftest_result.txt` in the game directory, then quits.
+
+## Nested `oldforge/` build (MinecraftForge 1.8.9 - 1.11.2)
+
+A third nested build, `modern/oldforge/`, builds the old Forge targets with **Unimined** (MCP names in development,
+reobfuscated to SRG names in the jar). It has its own plugin classpath like `legacy/`, and `./gradlew build`,
+`collectJars`, `clean`, `-Ptargets=` and `-Pmod_version=` in `modern/` include it automatically.
+
+| Target | Jar works on | Code |
+| --- | --- | --- |
+| `1.8.9-forge` | 1.8.9 | `versions/1.8.9`, `loaders/forge_uni/1.8.9` |
+| `1.9.4-forge` | 1.9, 1.9.4 | `versions/1.9.4`, `loaders/forge_uni/1.9.4` |
+| `1.10.2-forge` | 1.10, 1.10.2 | `versions/1.10.2`, `loaders/forge_uni/1.10.2` |
+| `1.11.2-forge` | 1.11, 1.11.2 | `versions/1.11.2`, `loaders/forge_uni/1.11.2` |
+
+Its jars: `modern/oldforge/targets/<mc>-forge/build/libs/inventorytodo-forge-<mc>-<version>.jar`.
+Each target sets `forge_version` and `mcp_mappings` in its `gradle.properties`; `.lang` files are generated from the
+shared JSON files (`lang_upper=true` gives the `en_US.lang` names used before 1.11).
