@@ -1,0 +1,20 @@
+plugins {
+    id 'xyz.wagyourtail.unimined' version "${unimined_version}" apply false
+}
+
+// Share modern/gradle.properties (mod name, version, ...) with this nested build
+def shared = new Properties()
+file('../gradle.properties').withInputStream { shared.load(it) }
+subprojects { p ->
+    shared.each { k, v -> if (!p.hasProperty(k)) p.ext.set(k, v) }
+}
+
+tasks.register('build') {
+    group = 'build'
+    dependsOn subprojects.collect { "${it.path}:build" }
+}
+
+tasks.register('clean') {
+    group = 'build'
+    dependsOn subprojects.collect { "${it.path}:clean" }
+}

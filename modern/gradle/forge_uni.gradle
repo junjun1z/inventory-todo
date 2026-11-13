@@ -1,0 +1,52 @@
+// MinecraftForge 1.8.9 - 1.11.2 through Unimined (MCP names in dev, reobfuscated to SRG for production)
+apply plugin: 'java'
+apply plugin: 'xyz.wagyourtail.unimined'
+apply from: rootProject.file('../gradle/common.gradle')
+
+def mcpMap = (project.property('mcp_mappings') as String).split(':')
+unimined.minecraft {
+    version project.property('mc_version')
+    side 'client'
+    mappings {
+        searge()
+        mcp(mcpMap[0], mcpMap[1])
+    }
+    minecraftForge {
+        loader project.property('forge_version')
+    }
+}
+
+// these versions read the .lang language files: generate them from the shared JSON files
+def langOut = layout.buildDirectory.dir('generated/legacylang')
+def genLang = tasks.register('generateLegacyLang') {
+    def modernDir = new File(rootProject.projectDir, 'common').exists() ? rootProject.projectDir : rootProject.projectDir.parentFile
+    def src = new File(modernDir, 'common/src/main/resources/assets/inventorytodo/lang')
+    def upper = project.findProperty('lang_upper') == 'true' // 1.8.9 - 1.10.2 use en_US.lang
+    inputs.dir(src)
+    inputs.property('upper', upper)
+    outputs.dir(langOut)
+    doLast {
+        def outDir = new File(langOut.get().asFile, 'assets/inventorytodo/lang')
+        outDir.deleteDir()
+        outDir.mkdirs()
+        src.listFiles().findAll { it.name.endsWith('.json') }.each { f ->
+            def map = new groovy.json.JsonSlurper().parse(f, 'UTF-8')
+            def base = f.name.replace('.json', '')
+            if (upper) {
+                def i = base.indexOf('_')
+                if (i > 0) base = base.substring(0, i) + '_' + base.substring(i + 1).toUpperCase()
+            }
+            new File(outDir, base + '.lang').withWriter('UTF-8') { w -> map.each { k, v -> w << "${k}=${v}\n" } }
+        }
+    }
+}
+processResources {
+    dependsOn genLang
+    from(langOut)
+    exclude 'assets/inventorytodo/lang/*.json'
+    filesMatching('mcmod.info') { expand(version: project.version, mc_version: project.property('mc_version'), mod_description: project.property('mod_description'), mod_homepage: project.property('mod_homepage'), mod_authors: project.property('mod_authors')) }
+}
+
+// keep only the reobfuscated (production) jar in build/libs
+tasks.named('jar') { destinationDirectory = layout.buildDirectory.dir('devlibs') }
+tasks.named('remapJar') { destinationDirectory = layout.buildDirectory.dir('libs') }

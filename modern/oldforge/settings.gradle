@@ -1,0 +1,26 @@
+// Nested build for MinecraftForge 1.8.9 - 1.11.2 through Unimined (MCP names, reobfuscated to SRG).
+// Kept separate because Unimined cannot share one plugin classpath with Architectury Loom / RFG / ForgeGradle.
+pluginManagement {
+    repositories {
+        maven { url = 'https://maven.wagyourtail.xyz/releases' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://maven.neoforged.net/releases' }
+        maven { url = 'https://maven.fabricmc.net/' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+rootProject.name = 'inventorytodo-oldforge'
+
+def targets = file('targets').listFiles().findAll { it.isDirectory() && new File(it, 'gradle.properties').exists() }
+        .collect { it.name }.sort()
+def only = providers.gradleProperty('targets').orNull
+if (only) targets = targets.findAll { only.split(',').contains(it) }
+targets.each { t ->
+    include(":$t")
+    project(":$t").projectDir = file("targets/$t")
+    project(":$t").buildFileName = '../../../gradle/target.gradle'
+}
