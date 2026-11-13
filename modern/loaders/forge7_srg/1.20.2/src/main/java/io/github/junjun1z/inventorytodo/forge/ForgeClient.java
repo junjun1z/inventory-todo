@@ -72,7 +72,7 @@ public final class ForgeClient {
             if (PANEL.mouseReleased(e.getScreen(), e.getMouseX(), e.getMouseY(), e.getButton())) e.setCanceled(true);
         });
         bus.addListener(EventPriority.HIGHEST, (ScreenEvent.MouseScrolled.Pre e) -> {
-            double d = e.getScrollDelta();
+            double d = e.getDeltaY();
             if (d != 0 && PANEL.mouseScrolled(e.getScreen(), e.getMouseX(), e.getMouseY(), d > 0 ? 1 : -1)) e.setCanceled(true);
         });
         bus.addListener(EventPriority.HIGHEST, (ScreenEvent.KeyPressed.Pre e) -> {

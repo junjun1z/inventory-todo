@@ -1,0 +1,47 @@
+// MinecraftForge 1.20.2 - 1.20.4 through ForgeGradle 7, then reobfuscated to SRG names.
+// These Forge versions still run on SRG names in production, ForgeGradle 7 has no reobf task and
+// ModDevGradle's legacy plugin cannot set them up, so ForgeAutoRenamingTool renames the jar here.
+apply from: rootProject.file('../gradle/forge7.gradle')
+
+def mcv = project.property('mc_version') as String
+
+configurations { fart }
+repositories { maven { url = 'https://maven.minecraftforge.net/' } }
+dependencies { fart 'net.minecraftforge:ForgeAutoRenamingTool:1.1.2:all' }
+
+// Mojang names -> SRG, written by ForgeGradle's mavenizer while setting up Minecraft
+// (the mavenizer stores the official->srg table as "official-<mc>-obf.tsrg.gz")
+def findSrgMap = {
+    def base = new File(gradle.gradleUserHomeDir, 'caches/minecraftforge/forgegradle/mavenizer/caches/mcp/de/oceanlabs/mcp/mcp_config')
+    def hits = []
+    base.eachFileRecurse { f -> if (f.name == "official-${mcv}-obf.tsrg.gz".toString()) hits << f }
+    if (hits.isEmpty()) throw new GradleException("official->srg mappings for ${mcv} not found under ${base}")
+    hits.sort { -it.lastModified() }.first()
+}
+
+def devJar = tasks.named('jar')
+def mojJar = layout.buildDirectory.file("devlibs/${base.archivesName.get()}-${project.version}-mojmap.jar")
+def srgMap = layout.buildDirectory.file('reobf/official-srg.tsrg')
+
+tasks.register('reobfJar', JavaExec) {
+    group = 'build'
+    description = 'Renames the jar from Mojang names to SRG names'
+    dependsOn devJar
+    classpath = configurations.fart
+    mainClass = 'net.minecraftforge.fart.Main'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    outputs.upToDateWhen { false }
+    doFirst {
+        def out = devJar.get().archiveFile.get().asFile
+        def moj = mojJar.get().asFile
+        moj.parentFile.mkdirs()
+        java.nio.file.Files.copy(out.toPath(), moj.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+        def map = srgMap.get().asFile
+        map.parentFile.mkdirs()
+        new java.util.zip.GZIPInputStream(new FileInputStream(findSrgMap())).withStream { i -> map.withOutputStream { o -> o << i } }
+        def libs = sourceSets.main.compileClasspath.files.collectMany { ['--lib', it.absolutePath] }
+        args(['--input', moj.absolutePath, '--output', out.absolutePath, '--map', map.absolutePath] + libs)
+    }
+}
+devJar.configure { finalizedBy 'reobfJar' }
+tasks.named('assemble') { dependsOn 'reobfJar' }
