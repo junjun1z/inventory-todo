@@ -1,3 +1,4 @@
 // Build file shared by every target (targets/<mc>-<loader>/gradle.properties sets mc_version, loader, ...)
 def loader = project.property('loader')
-apply from: rootProject.file("gradle/${loader}.gradle")
+def modernDir = new File(rootProject.projectDir, 'common').exists() ? rootProject.projectDir : rootProject.projectDir.parentFile
+apply from: new File(modernDir, "gradle/${loader}.gradle")

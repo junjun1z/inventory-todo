@@ -46,6 +46,7 @@ public final class TodoPanel {
     private boolean dragging, dragMoved, dragFromMini;
     private double dragGrabX, dragGrabY, dragStartX, dragStartY;
     private float dragFracX, dragFracY;
+    private long dragStartedAt;
 
     // ---- editing ----
     private TextField field;
@@ -757,6 +758,22 @@ public final class TodoPanel {
     // input (called by the loader glue)
     // =====================================================================
 
+    private TextField textInputOwner;
+
+    /** Keeps the game's text input (IME / character events) enabled exactly while a panel text field has focus */
+    private void syncTextInput(boolean screenOpen) {
+        TextField want = !screenOpen ? null
+            : field != null ? field : (searchOpen && searchField != null && searchField.isFocused() ? searchField : null);
+        if (want == textInputOwner) return;
+        try {
+            if (textInputOwner != null) mc().setTextInputActive(textInputOwner, false);
+            if (want != null) mc().setTextInputActive(want, true);
+        } catch (Throwable t) {
+            Log.debug("text input toggle failed: " + t);
+        }
+        textInputOwner = want;
+    }
+
     /** True while a text field has focus (all keys go to the panel) */
     public boolean isTyping() {
         return field != null || (searchOpen && searchField != null && searchField.isFocused());
@@ -831,8 +848,16 @@ public final class TodoPanel {
         return s == null || mc().isEmpty(s) ? null : s;
     }
 
+    /** The last press went to the panel: its release must not reach the screen either */
+    private boolean pressConsumed;
+
     /** @return true if the click was used and must not reach the screen */
     public boolean mouseClicked(Object screen, double dmx, double dmy, int button) {
+        pressConsumed = click(screen, dmx, dmy, button);
+        return pressConsumed;
+    }
+
+    private boolean click(Object screen, double dmx, double dmy, int button) {
         if (!active(screen)) return false;
         prepare(screen);
         int mx = (int) Math.floor(dmx), my = (int) Math.floor(dmy);
@@ -886,6 +911,7 @@ public final class TodoPanel {
                     dragging = true;
                     dragMoved = false;
                     dragFromMini = h.type == HitType.MINI;
+                    dragStartedAt = System.currentTimeMillis();
                     dragStartX = mc().mouseX();
                     dragStartY = mc().mouseY();
                     dragGrabX = dragStartX - px;
@@ -986,9 +1012,14 @@ public final class TodoPanel {
 
     /** @return true if the release belonged to the panel */
     public boolean mouseReleased(Object screen, double mx, double my, int button) {
-        if (!dragging) return false;
-        endDrag();
-        return true;
+        boolean consumed = pressConsumed;
+        pressConsumed = false;
+        if (dragging) {
+            endDrag();
+            return true;
+        }
+        // e.g. older versions drop the held item on a release outside the inventory
+        return consumed;
     }
 
     private void endDrag() {
@@ -1040,7 +1071,9 @@ public final class TodoPanel {
     /** Follows the real cursor every frame while dragging (sub-pixel smooth) */
     private void pollDrag() {
         if (!dragging) return;
-        if (!mc().isLeftMouseDown()) {
+        // The drag ends with the release event (always delivered by the loaders: the OS captures the mouse while a
+        // button is held). Polling the button is only a fallback after a while, for platforms that report it.
+        if (System.currentTimeMillis() - dragStartedAt > 400 && !dragMoved && !mc().isLeftMouseDown()) {
             endDrag();
             return;
         }
@@ -1083,6 +1116,7 @@ public final class TodoPanel {
         menu = null;
         settingsOpen = false;
         if (dragging) endDrag();
+        syncTextInput(false);
     }
 
     // =====================================================================
@@ -1245,6 +1279,7 @@ public final class TodoPanel {
     public void render(Object screen, Gfx g, int mx, int my) {
         if (!active(screen)) return;
         lastGfx = g;
+        syncTextInput(true);
         pollDrag();
         prepare(screen);
         updateSearchIfNeeded();

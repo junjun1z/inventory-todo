@@ -28,7 +28,7 @@ public final class SelfTest {
 
     private final DevPlatform dev;
     private final List<String> log = new ArrayList<>();
-    private int fails, step, wait, waited;
+    private int fails, step, wait, waited, menuTicks;
     private Robot robot;
     private double scaleX, scaleY, originX, originY;
     private int calSx, calSy;
@@ -44,6 +44,15 @@ public final class SelfTest {
         DevPlatform dev = (DevPlatform) Class.forName("io.github.junjun1z.inventorytodo.devtest.DevPlatformImpl")
             .getDeclaredConstructor()
             .newInstance();
+        String flag = new String(Files.readAllBytes(Core.mc()
+            .configDir()
+            .resolve("selftest.flag")), StandardCharsets.UTF_8);
+        if (flag.contains("showcase")) {
+            Showcase sc = new Showcase(dev);
+            Core.devTick = sc::tick;
+            Log.info("SHOWCASE armed");
+            return;
+        }
         SelfTest t = new SelfTest(dev);
         Core.devTick = t::tick;
         Log.info("SELFTEST armed");
@@ -138,12 +147,18 @@ public final class SelfTest {
         TodoStore store = Core.store();
         switch (step) {
             case 0:
-                if (!dev.inWorld()) return;
+                if (!dev.inWorld()) {
+                    // versions without quick play: open the test world from the title screen ourselves
+                    if (++waited % 100 == 1) Log.info("SELFTEST waiting for world, screen=" + currentScreen);
+                    if (currentScreen != null && ++menuTicks == 100) dev.loadWorld("claude_selftest");
+                    return;
+                }
                 if (currentScreen != null && ++waited < 200) {
                     dev.closeScreen();
                     return;
                 }
                 info("version=" + dev.versionName());
+                dev.prepareShowcase(); // daytime + peaceful: nothing interrupts the test
                 cfg.mode = Settings.Mode.FOLLOW;
                 cfg.minimized = false;
                 cfg.hudEnabled = false;
@@ -224,7 +239,7 @@ public final class SelfTest {
                 }
                 TodoEntry planks = null;
                 for (TodoEntry e : store.entries)
-                    if (e.item != null && "minecraft:oak_planks".equals(mc().registryId(e.item))) planks = e;
+                    if (e.item != null && String.valueOf(mc().registryId(e.item)).contains("planks")) planks = e;
                 Mc.Recipe r = mc().recipeFor(mc().stackById("minecraft:chest"));
                 info("chest recipe: " + (r == null ? "unavailable" : r.ingredients.size() + " ingredient(s)"));
                 if (r != null && !r.ingredients.isEmpty()) {
@@ -344,6 +359,11 @@ public final class SelfTest {
                 }
                 scaleX = 200.0 / (mx2 - calMx);
                 scaleY = 150.0 / (my2 - calMy);
+                if (scaleX < 0.2 || scaleX > 6 || scaleY < 0.2 || scaleY > 6 || Math.abs(scaleX - scaleY) > 0.3) {
+                    info(String.format("Robot calibration looks wrong (%.3f, %.3f) - checking input through the loader events instead", scaleX, scaleY));
+                    step = 60;
+                    return;
+                }
                 originX = calSx - calMx * scaleX;
                 originY = calSy - calMy * scaleY;
                 info(String.format("calibration %.3f %.3f origin %.0f,%.0f", scaleX, scaleY, originX, originY));
@@ -439,17 +459,23 @@ public final class SelfTest {
                 dragBeforeX = geti("px");
                 dragBeforeY = geti("py");
                 move(geti("px") + 20, geti("py") + 5);
-                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-                step++;
+                step = 35; // press a little later: SDL may handle the press before the move otherwise
                 wait = 3;
                 return;
             }
+            case 35:
+                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                step = 31;
+                wait = 3;
+                return;
             case 31:
+                info(String.format("drag start: mouse=%.1f,%.1f down=%s dragging=%s startedAt=%s pressConsumed=%s carried=%s screen=%s", mc().mouseX(), mc().mouseY(), mc().isLeftMouseDown(), getf("dragging"), getf("dragStartedAt"), getf("pressConsumed"), mc().carriedStack(), dev.screen()));
                 move(dragBeforeX + 20 + 30, dragBeforeY + 5 + 20);
                 step++;
                 wait = 5;
                 return;
             case 32:
+                info(String.format("drag end: mouse=%.1f,%.1f down=%s dragging=%s moved=%s", mc().mouseX(), mc().mouseY(), mc().isLeftMouseDown(), getf("dragging"), getf("dragMoved")));
                 check("Real drag moves the panel", geti("px") > dragBeforeX + 10 && geti("py") > dragBeforeY + 5,
                     dragBeforeX + "," + dragBeforeY + " -> " + geti("px") + "," + geti("py"));
                 robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);

@@ -1,0 +1,103 @@
+package io.github.junjun1z.inventorytodo.devtest;
+
+import java.nio.file.Path;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ScreenShotHelper;
+
+import org.lwjgl.opengl.Display;
+
+public class DevPlatformImpl implements DevPlatform {
+
+    private static Minecraft mc() {
+        return Minecraft.getMinecraft();
+    }
+
+    @Override
+    public boolean inWorld() {
+        return mc().player != null && mc().world != null;
+    }
+
+    @Override
+    public Object screen() {
+        return mc().currentScreen;
+    }
+
+    @Override
+    public void openInventory() {
+        mc().displayGuiScreen(new GuiInventory(mc().player));
+    }
+
+    @Override
+    public void closeScreen() {
+        mc().displayGuiScreen(null);
+    }
+
+    private static EntityPlayerMP player(MinecraftServer server) {
+        return server.getPlayerList().getPlayers().get(0);
+    }
+
+    @Override
+    public void clearInventory() {
+        MinecraftServer server = mc().getIntegratedServer();
+        server.addScheduledTask(() -> {
+            EntityPlayerMP p = player(server);
+            p.inventory.clear();
+            p.inventoryContainer.detectAndSendChanges();
+        });
+    }
+
+    @Override
+    public void give(String id, int count) {
+        MinecraftServer server = mc().getIntegratedServer();
+        server.addScheduledTask(() -> {
+            EntityPlayerMP p = player(server);
+            p.inventory.addItemStackToInventory(new ItemStack(Item.REGISTRY.getObject(new ResourceLocation(id)), count));
+            p.inventoryContainer.detectAndSendChanges();
+        });
+    }
+
+    @Override
+    public void screenshot(String name) {
+        ScreenShotHelper.saveScreenshot(mc().gameDir, name + ".png", mc().displayWidth, mc().displayHeight, mc().getFramebuffer());
+    }
+
+    @Override
+    public void stop() {
+        mc().shutdown();
+    }
+
+    @Override
+    public Path gameDir() {
+        return mc().gameDir.toPath();
+    }
+
+    @Override
+    public int windowX() {
+        return Display.getX();
+    }
+
+    @Override
+    public int windowY() {
+        return Display.getY();
+    }
+
+    @Override
+    public String versionName() {
+        return "1.12.2";
+    }
+
+    @Override
+    public void focusWindow() {}
+
+    @Override
+    public void loadWorld(String folder) {
+        mc().launchIntegratedServer(folder, folder, null);
+    }
+}

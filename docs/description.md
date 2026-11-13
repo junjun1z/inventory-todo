@@ -31,7 +31,7 @@ None of these are required. When installed, Inventory ToDo uses them automatical
 | Mod | What you get |
 | --- | --- |
 | NEI (original or GTNH fork) | Modifier+click and drag & drop from the item list, recipe/usage on icon click, NEI keys (R / U) work over list items |
-| JEI | Hovered-item adding, drag & drop, recipes/usages on icon click |
+| JEI (1.20.1 and newer) | Hovered-item adding, drag & drop, recipes/usages on icon click |
 | EMI | Hovered-item adding, drag & drop, recipes/usages on icon click |
 | REI | Hovered-item adding, drag & drop, recipes/usages on icon click |
 
@@ -40,6 +40,18 @@ None of these are required. When installed, Inventory ToDo uses them automatical
 <!-- support-table:start -->
 | Minecraft | Loaders |
 | --- | --- |
+| 26.3 | Forge, NeoForge, Fabric |
+| 26.2 | NeoForge, Fabric |
+| 26.1.2 | NeoForge, Fabric |
+| 26.1.1 | NeoForge, Fabric |
+| 26.1 | NeoForge, Fabric |
+| 1.21.11 | NeoForge, Fabric |
+| 1.21.1 | NeoForge, Fabric |
+| 1.20.1 | Forge, Fabric |
+| 1.19.2 | Forge, Fabric |
+| 1.18.2 | Forge, Fabric |
+| 1.16.5 | Forge, Fabric |
+| 1.12.2 | Forge |
 | 1.7.10 | Forge |
 <!-- support-table:end -->
 

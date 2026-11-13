@@ -113,6 +113,12 @@ public interface Mc {
 
     boolean isLeftMouseDown();
 
+    /**
+     * Tells the game that the panel's text field wants keyboard text (Minecraft 26.x only enables OS text input
+     * while a text field has focus). Default: nothing to do.
+     */
+    default void setTextInputActive(Object owner, boolean active) {}
+
     boolean isShiftDown();
 
     boolean isCtrlDown();

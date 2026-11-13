@@ -1,0 +1,15 @@
+// MinecraftForge 26.x through ForgeGradle 7 (Minecraft is no longer obfuscated: no reobfuscation needed)
+apply plugin: 'java'
+apply plugin: 'net.minecraftforge.gradle'
+apply from: rootProject.file('../gradle/common.gradle')
+
+repositories {
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
+dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${project.property('mc_version')}-${project.property('forge_version')}")
+}

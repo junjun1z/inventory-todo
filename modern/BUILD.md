@@ -30,6 +30,21 @@ GitHub Actions example:
   working-directory: modern
 ```
 
+## Nested `legacy/` build
+
+Targets that need a different Gradle plugin live in `modern/legacy/` (a separate build with its own plugin
+classpath, so it cannot clash with Fabric Loom / ModDevGradle). `./gradlew build` and `./gradlew collectJars`
+in `modern/` build it automatically; `-Ptargets=` and `-Pmod_version=` apply to it as well.
+
+| Target | Plugin |
+| --- | --- |
+| `1.16.5-forge` | Architectury Loom (official mappings, remapped to SRG) |
+| `1.12.2-forge` | RetroFuturaGradle (MCP names, reobfuscated) |
+| `26.3-forge` | ForgeGradle 7 |
+
+Its jars: `modern/legacy/targets/<mc>-forge/build/libs/inventorytodo-forge-<mc>-<version>.jar`.
+Java 8 toolchains (1.12.2 / 1.16.5) are downloaded automatically like the others.
+
 ## Layout
 
 | Path | Contents |

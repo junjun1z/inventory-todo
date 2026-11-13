@@ -31,6 +31,18 @@
 <!-- support-table:start -->
 | Minecraft | ローダー |
 | --- | --- |
+| 26.3 | Forge, NeoForge, Fabric |
+| 26.2 | NeoForge, Fabric |
+| 26.1.2 | NeoForge, Fabric |
+| 26.1.1 | NeoForge, Fabric |
+| 26.1 | NeoForge, Fabric |
+| 1.21.11 | NeoForge, Fabric |
+| 1.21.1 | NeoForge, Fabric |
+| 1.20.1 | Forge, Fabric |
+| 1.19.2 | Forge, Fabric |
+| 1.18.2 | Forge, Fabric |
+| 1.16.5 | Forge, Fabric |
+| 1.12.2 | Forge |
 | 1.7.10 | Forge |
 <!-- support-table:end -->
 
@@ -39,7 +51,7 @@
 | mod | できること |
 | --- | --- |
 | NEI（元祖版・GTNH 版） | アイテム一覧からの修飾キー+クリック／ドラッグ＆ドロップ、アイコンクリックでレシピ・用途、リスト上で NEI のキー（R / U） |
-| JEI / EMI / REI | マウス下のアイテムを追加、ドラッグ＆ドロップ、アイコンクリックでレシピ・用途 |
+| JEI（1.20.1 以降）/ EMI / REI | マウス下のアイテムを追加、ドラッグ＆ドロップ、アイコンクリックでレシピ・用途 |
 
 ## よくある質問
 

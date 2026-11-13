@@ -1,0 +1,22 @@
+plugins {
+    id 'dev.architectury.loom' version "${arch_loom_version}" apply false
+    id 'com.gtnewhorizons.retrofuturagradle' version "${rfg_version}" apply false
+    id 'net.minecraftforge.gradle' version "${forgegradle_version}" apply false
+}
+
+// Share modern/gradle.properties (mod name, version, ...) with this nested build
+def shared = new Properties()
+file('../gradle.properties').withInputStream { shared.load(it) }
+subprojects { p ->
+    shared.each { k, v -> if (!p.hasProperty(k)) p.ext.set(k, v) }
+}
+
+tasks.register('build') {
+    group = 'build'
+    dependsOn subprojects.collect { "${it.path}:build" }
+}
+
+tasks.register('clean') {
+    group = 'build'
+    dependsOn subprojects.collect { "${it.path}:clean" }
+}

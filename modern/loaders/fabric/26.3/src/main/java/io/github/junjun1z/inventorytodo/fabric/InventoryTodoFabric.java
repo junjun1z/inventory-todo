@@ -63,8 +63,8 @@ public class InventoryTodoFabric implements ClientModInitializer {
         ScreenEvents.AFTER_INIT.register((client, screen, w, h) -> {
             if (!(screen instanceof AbstractContainerScreen)) return;
             panel.onScreenOpened(screen);
-            ScreenMouseEvents.allowMouseClick(screen).register((s, e) -> !panel.mouseClicked(s, e.x(), e.y(), e.button()));
-            ScreenMouseEvents.allowMouseRelease(screen).register((s, e) -> !panel.mouseReleased(s, e.x(), e.y(), e.button()));
+            ScreenMouseEvents.allowMouseClick(screen).register((s, e) -> !panel.mouseClicked(s, e.x(), e.y(), McImpl.button(e.button())));
+            ScreenMouseEvents.allowMouseRelease(screen).register((s, e) -> !panel.mouseReleased(s, e.x(), e.y(), McImpl.button(e.button())));
             ScreenMouseEvents.allowMouseScroll(screen).register((s, mx, my, ha, va) -> va == 0 || !panel.mouseScrolled(s, mx, my, va > 0 ? 1 : -1));
             ScreenKeyboardEvents.allowKeyPress(screen).register((s, e) -> {
                 if (panel.keyPressed(s, e.key())) return false;

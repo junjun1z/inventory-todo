@@ -1,0 +1,13 @@
+// MinecraftForge before 1.17 through Architectury Loom (official mappings, remapped to SRG for production)
+apply plugin: 'dev.architectury.loom'
+apply from: rootProject.file('../gradle/common.gradle')
+
+loom {
+    silentMojangMappingsLicense()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.property('mc_version')}"
+    mappings loom.officialMojangMappings()
+    forge "net.minecraftforge:forge:${project.property('mc_version')}-${project.property('forge_version')}"
+}

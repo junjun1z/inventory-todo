@@ -8,17 +8,20 @@ def cliVersion = gradle.startParameter.projectProperties['mod_version']
 def envVersion = System.getenv('MOD_VERSION')
 version = cliVersion ?: (envVersion ?: project.property('mod_version'))
 group = project.property('mod_group')
-base { archivesName = "inventorytodo-${loader}-${mcv}" }
+// published loader name (e.g. "forge" for the Architectury-based Forge targets)
+def loaderName = project.findProperty('loader_name') ?: loader
+base { archivesName = "inventorytodo-${loaderName}-${mcv}" }
 
 java {
     toolchain { languageVersion = JavaLanguageVersion.of(javaVersion) }
 }
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release = javaVersion
+    if (javaVersion > 8) options.release = javaVersion // javac 8 has no --release (the Java 8 toolchain is used as-is)
 }
 
-def root = rootProject.projectDir
+// modern/ (also when used from the nested legacy/ build)
+def root = new File(rootProject.projectDir, 'common').exists() ? rootProject.projectDir : rootProject.projectDir.parentFile
 sourceSets {
     main {
         java {

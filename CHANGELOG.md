@@ -3,6 +3,16 @@
 All notable changes to Inventory ToDo. The newest version is at the top.
 The release workflow uses the section that matches the tag as the release notes.
 
+## [1.1.0]
+
+### Added
+- Minecraft 1.12.2 (Forge), 1.16.5 (Forge, Fabric), 1.21.11 (Fabric, NeoForge) and 26.3 (Forge)
+
+### Fixed
+- 26.x: left click opened the row menu and right click / header dragging did nothing (mouse button numbering)
+- 26.x: typing into notes and goal amounts did not work
+- All modern versions: releasing a click on the panel could reach the inventory screen and drop the held item
+
 ## [1.0.0]
 
 First release.

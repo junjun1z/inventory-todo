@@ -1,0 +1,37 @@
+// MinecraftForge 1.12.2 through RetroFuturaGradle (MCP names, reobfuscated to SRG for production)
+apply plugin: 'com.gtnewhorizons.retrofuturagradle'
+apply from: rootProject.file('../gradle/common.gradle')
+
+minecraft {
+    mcVersion = project.property('mc_version')
+    mcpMappingChannel = 'stable'
+    mcpMappingVersion = '39'
+    username = 'Developer'
+}
+
+// 1.12.2 reads the .lang language files: generate them from the shared JSON files
+def langOut = layout.buildDirectory.dir('generated/lang112')
+def genLang = tasks.register('generateLegacyLang') {
+    def modernDir = new File(rootProject.projectDir, 'common').exists() ? rootProject.projectDir : rootProject.projectDir.parentFile
+    def src = new File(modernDir, 'common/src/main/resources/assets/inventorytodo/lang')
+    inputs.dir(src)
+    outputs.dir(langOut)
+    doLast {
+        def outDir = new File(langOut.get().asFile, 'assets/inventorytodo/lang')
+        outDir.mkdirs()
+        src.listFiles().findAll { it.name.endsWith('.json') }.each { f ->
+            def map = new groovy.json.JsonSlurper().parse(f, 'UTF-8')
+            def name = f.name.replace('.json', '.lang') // 1.12 uses lower-case names like en_us.lang
+            new File(outDir, name).withWriter('UTF-8') { w -> map.each { k, v -> w << "${k}=${v}\n" } }
+        }
+    }
+}
+processResources {
+    dependsOn genLang
+    from(langOut)
+    filesMatching('mcmod.info') { expand(version: project.version, mod_description: project.property('mod_description'), mod_homepage: project.property('mod_homepage'), mod_authors: project.property('mod_authors')) }
+}
+
+// keep only the reobfuscated (production) jar in build/libs
+tasks.named("jar") { destinationDirectory = layout.buildDirectory.dir("devlibs") }
+tasks.named("reobfJar") { destinationDirectory = layout.buildDirectory.dir("libs") }

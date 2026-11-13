@@ -365,7 +365,25 @@ public class McImpl implements Mc {
 
     @Override
     public boolean isLeftMouseDown() {
-        return mc().mouseHandler.isLeftPressed();
+        // MouseHandler only tracks buttons for the world view: ask the window library (SDL in 26.2+, GLFW before)
+        try {
+            if (mouseState == null) {
+                try {
+                    mouseState = Class.forName("org.lwjgl.sdl.SDLMouse")
+                        .getMethod("SDL_GetMouseState", java.nio.FloatBuffer.class, java.nio.FloatBuffer.class);
+                    sdl = true;
+                } catch (ClassNotFoundException e) {
+                    mouseState = Class.forName("org.lwjgl.glfw.GLFW")
+                        .getMethod("glfwGetMouseButton", long.class, int.class);
+                    sdl = false;
+                }
+            }
+            if (sdl) return ((Integer) mouseState.invoke(null, null, null) & 1) != 0;
+            return (Integer) mouseState.invoke(null, mc().getWindow()
+                .handle(), 0) == 1;
+        } catch (Throwable t) {
+            return mc().mouseHandler.isLeftPressed();
+        }
     }
 
     @Override
@@ -381,6 +399,24 @@ public class McImpl implements Mc {
     @Override
     public boolean isAltDown() {
         return mc().hasAltDown();
+    }
+
+    private static java.lang.reflect.Method textInputManager, onTextInputFocusChange, mouseState;
+    private static boolean sdl;
+
+    /** Minecraft 26.x enables SDL text input only for a focused text field: do the same for the panel */
+    @Override
+    public void setTextInputActive(Object owner, boolean active) {
+        try {
+            if (textInputManager == null) {
+                textInputManager = Minecraft.class.getMethod("textInputManager");
+                onTextInputFocusChange = textInputManager.getReturnType()
+                    .getMethod("onTextInputFocusChange", Object.class, boolean.class);
+            }
+            onTextInputFocusChange.invoke(textInputManager.invoke(mc()), owner, active);
+        } catch (Throwable t) {
+            Log.debug("text input manager unavailable: " + t);
+        }
     }
 
     // ------------------------------------------------------------------ text
@@ -462,5 +498,27 @@ public class McImpl implements Mc {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Minecraft 26.x numbers mouse buttons like SDL (left = 1, middle = 2, right = 3); the panel uses the classic
+     * numbering (left = 0, right = 1, middle = 2).
+     */
+    public static int button(int sdlButton) {
+        switch (sdlButton) {
+            case InputConstants.MOUSE_BUTTON_LEFT:
+                return 0;
+            case InputConstants.MOUSE_BUTTON_RIGHT:
+                return 1;
+            case InputConstants.MOUSE_BUTTON_MIDDLE:
+                return 2;
+            default:
+                return sdlButton - 1;
+        }
+    }
+
+    /** Inverse of {@link #button(int)} (used by the development self-test) */
+    public static int sdlButton(int button) {
+        return button == 0 ? InputConstants.MOUSE_BUTTON_LEFT : button == 1 ? InputConstants.MOUSE_BUTTON_RIGHT : button == 2 ? InputConstants.MOUSE_BUTTON_MIDDLE : button + 1;
     }
 }

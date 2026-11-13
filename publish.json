@@ -289,6 +289,118 @@
           "rei"
         ]
       }
+    },
+    {
+      "path": "modern/targets/1.21.11-fabric/build/libs/inventorytodo-fabric-1.21.11-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "1.21.11"
+      ],
+      "java": 21,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.21.11-neoforge/build/libs/inventorytodo-neoforge-1.21.11-*.jar",
+      "loaders": [
+        "neoforge"
+      ],
+      "game_versions": [
+        "1.21.11"
+      ],
+      "java": 21,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/targets/1.16.5-fabric/build/libs/inventorytodo-fabric-1.16.5-*.jar",
+      "loaders": [
+        "fabric"
+      ],
+      "game_versions": [
+        "1.16.5"
+      ],
+      "java": 8,
+      "dependencies": {
+        "required": [
+          "fabric-api"
+        ],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/legacy/targets/1.16.5-forge/build/libs/inventorytodo-forge-1.16.5-*.jar",
+      "loaders": [
+        "forge"
+      ],
+      "game_versions": [
+        "1.16.5"
+      ],
+      "java": 8,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/legacy/targets/1.12.2-forge/build/libs/inventorytodo-forge-1.12.2-*.jar",
+      "loaders": [
+        "forge"
+      ],
+      "game_versions": [
+        "1.12.2"
+      ],
+      "java": 8,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
+    },
+    {
+      "path": "modern/legacy/targets/26.3-forge/build/libs/inventorytodo-forge-26.3-*.jar",
+      "loaders": [
+        "forge"
+      ],
+      "game_versions": [
+        "26.3"
+      ],
+      "java": 25,
+      "dependencies": {
+        "required": [],
+        "optional": [
+          "jei",
+          "emi",
+          "rei"
+        ]
+      }
     }
   ]
 }

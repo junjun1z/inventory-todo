@@ -93,4 +93,26 @@ public class DevPlatformImpl implements DevPlatform {
             p.inventoryMenu.broadcastChanges();
         });
     }
+
+    @Override
+    public void prepareShowcase() {
+        MinecraftServer server = mc().getSingleplayerServer();
+        server.execute(() -> {
+            for (String cmd : new String[] { "difficulty peaceful", "time set 1000", "weather clear 100000", "gamerule doDaylightCycle false", "gamerule announceAdvancements false" }) {
+                try {
+                    server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), cmd);
+                } catch (Throwable ignored) {}
+            }
+        });
+    }
+
+    @Override
+    public void clearOverlays() {
+        try {
+            mc().getToasts().clear();
+            mc().gui.getChat().clearMessages(false);
+        } catch (Throwable t) {
+            io.github.junjun1z.inventorytodo.core.Log.warn("clearOverlays: " + t);
+        }
+    }
 }

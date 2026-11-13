@@ -13,7 +13,7 @@ public class DevInput implements DevInputApi {
     @Override
     public boolean click(Object screen, double x, double y, int button) {
         Screen s = (Screen) screen;
-        return !ScreenMouseEvents.allowMouseClick(s).invoker().allowMouseClick(s, new MouseButtonEvent(x, y, new MouseButtonInfo(button, 0)));
+        return !ScreenMouseEvents.allowMouseClick(s).invoker().allowMouseClick(s, new MouseButtonEvent(x, y, new MouseButtonInfo(io.github.junjun1z.inventorytodo.mc.McImpl.sdlButton(button), 0)));
     }
 
     @Override

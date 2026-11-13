@@ -5,11 +5,29 @@ plugins {
     id 'net.neoforged.moddev.legacyforge' version "${moddev_version}" apply false
 }
 
-// Copies every release jar into build/dist (handy for CI and manual uploads)
-tasks.register('collectJars', Copy) {
+// Copies the release jars of this version into build/dist (replacing what was there)
+def distVersion = gradle.startParameter.projectProperties['mod_version'] ?: (System.getenv('MOD_VERSION') ?: project.property('mod_version'))
+tasks.register('collectJars', Sync) {
     group = 'build'
     description = 'Builds all targets and copies their jars to build/dist'
     subprojects.each { p -> dependsOn("${p.path}:build") }
-    from(subprojects.collect { new File(it.projectDir, 'build/libs') }) { include 'inventorytodo-*.jar' }
+    dependsOn gradle.includedBuild('legacy').task(':build')
+    from(subprojects.collect { new File(it.projectDir, 'build/libs') }) { include "inventorytodo-*-${distVersion}.jar" }
+    from(fileTree('legacy/targets') { include "*/build/libs/inventorytodo-*-${distVersion}.jar" })
+    eachFile { path = name }
+    includeEmptyDirs = false
     into layout.buildDirectory.dir('dist')
+}
+
+// `./gradlew build` also builds the nested legacy build (Architectury Loom targets)
+tasks.register('build') {
+    group = 'build'
+    description = 'Builds every target, including the nested legacy build'
+    dependsOn gradle.includedBuild('legacy').task(':build')
+}
+
+// `./gradlew clean` also cleans the nested legacy build
+tasks.register('clean') {
+    group = 'build'
+    dependsOn gradle.includedBuild('legacy').task(':clean')
 }

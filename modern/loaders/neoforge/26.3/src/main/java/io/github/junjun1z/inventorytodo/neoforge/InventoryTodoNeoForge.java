@@ -70,10 +70,10 @@ public class InventoryTodoNeoForge {
         });
         bus.addListener((ScreenEvent.Closing e) -> PANEL.onScreenClosed());
         bus.addListener(EventPriority.HIGHEST, (ScreenEvent.MouseButtonPressed.Pre e) -> {
-            if (PANEL.mouseClicked(e.getScreen(), e.getMouseX(), e.getMouseY(), e.getButton())) e.setCanceled(true);
+            if (PANEL.mouseClicked(e.getScreen(), e.getMouseX(), e.getMouseY(), McImpl.button(e.getButton()))) e.setCanceled(true);
         });
         bus.addListener(EventPriority.HIGHEST, (ScreenEvent.MouseButtonReleased.Pre e) -> {
-            if (PANEL.mouseReleased(e.getScreen(), e.getMouseX(), e.getMouseY(), e.getButton())) e.setCanceled(true);
+            if (PANEL.mouseReleased(e.getScreen(), e.getMouseX(), e.getMouseY(), McImpl.button(e.getButton()))) e.setCanceled(true);
         });
         bus.addListener(EventPriority.HIGHEST, (ScreenEvent.MouseScrolled.Pre e) -> {
             double d = e.getScrollDeltaY();

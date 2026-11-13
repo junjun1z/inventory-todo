@@ -61,7 +61,7 @@ public final class TodoStore {
         Path f = file();
         if (!Files.exists(f)) return;
         try (Reader r = Files.newBufferedReader(f, StandardCharsets.UTF_8)) {
-            JsonObject root = JsonParser.parseReader(r)
+            @SuppressWarnings("deprecation") JsonObject root = new JsonParser().parse(r)
                 .getAsJsonObject();
             for (JsonElement el : root.getAsJsonArray("entries")) {
                 JsonObject o = el.getAsJsonObject();

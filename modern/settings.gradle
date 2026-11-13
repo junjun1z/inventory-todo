@@ -25,3 +25,6 @@ targets.each { t ->
     project(":$t").projectDir = file("targets/$t")
     project(":$t").buildFileName = '../../gradle/target.gradle'
 }
+
+// MinecraftForge before 1.17 (Architectury Loom) lives in a nested build with its own plugin classpath
+includeBuild('legacy')

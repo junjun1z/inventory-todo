@@ -1,0 +1,26 @@
+// Nested build for targets that need Architectury Loom (MinecraftForge before 1.17).
+// Kept separate because Architectury Loom and Fabric Loom cannot share one build classpath.
+pluginManagement {
+    repositories {
+        maven { url = 'https://maven.architectury.dev/' }
+        maven { url = 'https://maven.fabricmc.net/' }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://nexus.gtnewhorizons.com/repository/public/' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+rootProject.name = 'inventorytodo-legacy'
+
+def targets = file('targets').listFiles().findAll { it.isDirectory() && new File(it, 'gradle.properties').exists() }
+        .collect { it.name }.sort()
+def only = providers.gradleProperty('targets').orNull
+if (only) targets = targets.findAll { only.split(',').contains(it) }
+targets.each { t ->
+    include(":$t")
+    project(":$t").projectDir = file("targets/$t")
+    project(":$t").buildFileName = '../../../gradle/target.gradle'
+}
