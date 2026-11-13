@@ -1,5 +1,6 @@
 package io.github.junjun1z.inventorytodo.mc;
 
+import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -29,8 +31,9 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -39,7 +42,7 @@ import io.github.junjun1z.inventorytodo.core.Keys;
 import io.github.junjun1z.inventorytodo.core.Log;
 import io.github.junjun1z.inventorytodo.core.Mc;
 
-/** {@link Mc} for Minecraft 1.8.9 (MCP names, LWJGL 2). */
+/** {@link Mc} for Minecraft 1.8.9 (MCP names, LWJGL 2, nullable item stacks). */
 public class McImpl implements Mc {
 
     private final Path configDir;
@@ -74,17 +77,38 @@ public class McImpl implements Mc {
         return (ItemStack) o;
     }
 
+    private static boolean empty(ItemStack st) {
+        return st == null || st.getItem() == null || st.stackSize <= 0;
+    }
+
+    // GuiContainer has no getters for its position here (protected fields)
+    private static final Field GUI_LEFT = field("guiLeft", "field_147003_i");
+    private static final Field GUI_TOP = field("guiTop", "field_147009_r");
+    private static final Field X_SIZE = field("xSize", "field_146999_f");
+
+    private static Field field(String... names) {
+        return ReflectionHelper.findField(GuiContainer.class, names);
+    }
+
+    private static int intField(Field f, Object screen) {
+        try {
+            return f.getInt(screen);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     // ------------------------------------------------------------------ items
 
     @Override
     public boolean isEmpty(Object stack) {
-        return stack == null || s(stack).isEmpty();
+        return empty(s(stack));
     }
 
     @Override
     public Object copyOne(Object stack) {
         ItemStack c = s(stack).copy();
-        c.setCount(1);
+        c.stackSize = 1;
         return c;
     }
 
@@ -105,7 +129,7 @@ public class McImpl implements Mc {
 
     @Override
     public int count(Object stack) {
-        return s(stack).getCount();
+        return s(stack).stackSize;
     }
 
     @Override
@@ -123,7 +147,7 @@ public class McImpl implements Mc {
         if (english == null && !englishFailed) {
             try {
                 net.minecraft.client.resources.Locale loc = new net.minecraft.client.resources.Locale();
-                loc.loadLocaleDataFiles(mc().getResourceManager(), Collections.singletonList("en_us"));
+                loc.loadLocaleDataFiles(mc().getResourceManager(), Collections.singletonList("en_US"));
                 english = loc;
             } catch (Throwable t) {
                 englishFailed = true;
@@ -138,16 +162,16 @@ public class McImpl implements Mc {
 
     @Override
     public String registryId(Object stack) {
-        ResourceLocation rl = Item.REGISTRY.getNameForObject(s(stack).getItem());
+        ResourceLocation rl = Item.itemRegistry.getNameForObject(s(stack).getItem());
         return rl == null ? null : rl.toString();
     }
 
     @Override
     public List<Object> allItems() {
-        NonNullList<ItemStack> list = NonNullList.create();
-        for (Item item : Item.REGISTRY) {
+        List<ItemStack> list = new ArrayList<>();
+        for (Item item : Item.itemRegistry) {
             try {
-                item.getSubItems(item, CreativeTabs.SEARCH, list);
+                item.getSubItems(item, CreativeTabs.tabAllSearch, list);
             } catch (Throwable t) {
                 Log.debug("could not list " + item + ": " + t);
             }
@@ -164,7 +188,7 @@ public class McImpl implements Mc {
             name = parts[0] + ":" + parts[1];
             meta = Integer.parseInt(parts[2]);
         }
-        Item item = Item.REGISTRY.getObject(new ResourceLocation(name));
+        Item item = Item.itemRegistry.getObject(new ResourceLocation(name));
         return item == null ? null : new ItemStack(item, 1, meta);
     }
 
@@ -178,9 +202,9 @@ public class McImpl implements Mc {
     public Object deserialize(String data) {
         try {
             NBTTagCompound tag = JsonToNBT.getTagFromJson(data);
-            if (Item.REGISTRY.getObject(new ResourceLocation(tag.getString("id"))) == null) return null;
-            ItemStack st = new ItemStack(tag);
-            return st.isEmpty() ? null : st;
+            if (Item.itemRegistry.getObject(new ResourceLocation(tag.getString("id"))) == null) return null;
+            ItemStack st = ItemStack.loadItemStackFromNBT(tag);
+            return empty(st) ? null : st;
         } catch (Exception e) {
             return null;
         }
@@ -188,7 +212,7 @@ public class McImpl implements Mc {
 
     @Override
     public Object iconStack() {
-        return new ItemStack(Items.WRITABLE_BOOK);
+        return new ItemStack(Items.writable_book);
     }
 
     @Override
@@ -197,11 +221,11 @@ public class McImpl implements Mc {
         for (IRecipe r : CraftingManager.getInstance()
             .getRecipeList()) {
             ItemStack result = r.getRecipeOutput();
-            if (result == null || result.isEmpty() || result.getItem() != target.getItem()) continue;
+            if (empty(result) || result.getItem() != target.getItem()) continue;
             if (!target.isItemStackDamageable() && result.getMetadata() != target.getMetadata()) continue;
             List<?> inputs = inputsOf(r);
             if (inputs == null) continue;
-            return new Recipe(ingredients(inputs), result.getCount());
+            return new Recipe(ingredients(inputs), result.stackSize);
         }
         return new Recipe(Collections.emptyList(), 1);
     }
@@ -222,8 +246,8 @@ public class McImpl implements Mc {
             ItemStack o = null;
             if (in instanceof ItemStack) o = (ItemStack) in;
             else if (in instanceof List && !((List<?>) in).isEmpty() && ((List<?>) in).get(0) instanceof ItemStack) o = (ItemStack) ((List<?>) in).get(0);
-            if (o == null || o.isEmpty()) continue;
-            String key = Item.REGISTRY.getNameForObject(o.getItem()) + ":" + (o.getMetadata() == 32767 ? 0 : o.getMetadata());
+            if (empty(o)) continue;
+            String key = Item.itemRegistry.getNameForObject(o.getItem()) + ":" + (o.getMetadata() == 32767 ? 0 : o.getMetadata());
             counts.merge(key, 1, Integer::sum);
             first.putIfAbsent(key, o);
         }
@@ -232,7 +256,7 @@ public class McImpl implements Mc {
             ItemStack st = first.get(e.getKey())
                 .copy();
             if (st.getMetadata() == 32767) st.setItemDamage(0);
-            st.setCount(e.getValue());
+            st.stackSize = e.getValue();
             out.add(st);
         }
         return out;
@@ -242,14 +266,13 @@ public class McImpl implements Mc {
 
     @Override
     public boolean hasPlayer() {
-        return mc().player != null;
+        return mc().thePlayer != null;
     }
 
     @Override
     public List<Object> playerStacks() {
-        InventoryPlayer inv = mc().player.inventory;
-        List<Object> out = new ArrayList<Object>(inv.mainInventory);
-        out.addAll(inv.offHandInventory);
+        InventoryPlayer inv = mc().thePlayer.inventory;
+        List<Object> out = new ArrayList<Object>(Arrays.asList(inv.mainInventory));
         return out;
     }
 
@@ -257,7 +280,7 @@ public class McImpl implements Mc {
     public List<Object> containerStacks(Object screen) {
         List<Object> out = new ArrayList<>();
         if (!(screen instanceof GuiContainer)) return out;
-        InventoryPlayer inv = mc().player.inventory;
+        InventoryPlayer inv = mc().thePlayer.inventory;
         for (Slot slot : ((GuiContainer) screen).inventorySlots.inventorySlots) {
             if (slot.inventory != inv && slot.getHasStack()) out.add(slot.getStack());
         }
@@ -266,7 +289,7 @@ public class McImpl implements Mc {
 
     @Override
     public Object carriedStack() {
-        return mc().player == null ? ItemStack.EMPTY : mc().player.inventory.getItemStack();
+        return mc().thePlayer == null ? null : mc().thePlayer.inventory.getItemStack();
     }
 
     @Override
@@ -301,17 +324,17 @@ public class McImpl implements Mc {
 
     @Override
     public int guiLeft(Object screen) {
-        return ((GuiContainer) screen).getGuiLeft();
+        return intField(GUI_LEFT, screen);
     }
 
     @Override
     public int guiTop(Object screen) {
-        return ((GuiContainer) screen).getGuiTop();
+        return intField(GUI_TOP, screen);
     }
 
     @Override
     public int imageWidth(Object screen) {
-        return ((GuiContainer) screen).getXSize();
+        return intField(X_SIZE, screen);
     }
 
     @Override
@@ -390,6 +413,6 @@ public class McImpl implements Mc {
 
     private static String keyName(KeyBinding k) {
         if (k == null || k.getKeyCode() == 0) return null;
-        return k.getDisplayName();
+        return GameSettings.getKeyDisplayString(k.getKeyCode());
     }
 }

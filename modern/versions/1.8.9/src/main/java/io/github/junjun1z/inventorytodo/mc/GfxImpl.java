@@ -9,9 +9,9 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
 import io.github.junjun1z.inventorytodo.core.Gfx;
@@ -20,7 +20,7 @@ import io.github.junjun1z.inventorytodo.core.Gfx;
 public class GfxImpl implements Gfx {
 
     private final GuiScreen screen;
-    private final FontRenderer font = Minecraft.getMinecraft().fontRenderer;
+    private final FontRenderer font = Minecraft.getMinecraft().fontRendererObj;
     private float z;
 
     public GfxImpl(GuiScreen screen) {
@@ -87,12 +87,12 @@ public class GfxImpl implements Gfx {
         if (screen == null) return;
         ItemStack st = (ItemStack) stack;
         Minecraft mc = Minecraft.getMinecraft();
-        List<String> lines = new ArrayList<>(st.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips));
+        List<String> lines = new ArrayList<>(st.getTooltip(mc.thePlayer, mc.gameSettings.advancedItemTooltips));
         for (int i = 0; i < lines.size(); i++) {
-            lines.set(i, (i == 0 ? st.getRarity().rarityColor : TextFormatting.GRAY) + lines.get(i));
+            lines.set(i, (i == 0 ? st.getRarity().rarityColor : EnumChatFormatting.GRAY) + lines.get(i));
         }
         lines.addAll(extra);
-        GuiUtils.drawHoveringText(st, lines, mx, my, screen.width, screen.height, -1, font);
+        GuiUtils.drawHoveringText(lines, mx, my, screen.width, screen.height, -1, font);
         GlStateManager.disableLighting();
         GlStateManager.disableDepth();
     }

@@ -61,17 +61,17 @@ public class InventoryTodoForge {
     @SubscribeEvent
     public void onInit(GuiScreenEvent.InitGuiEvent.Post e) {
         captured = false;
-        if (e.getGui() instanceof GuiContainer) PANEL.onScreenOpened(e.getGui());
+        if (e.gui instanceof GuiContainer) PANEL.onScreenOpened(e.gui);
     }
 
     @SubscribeEvent
     public void onOpen(GuiOpenEvent e) {
-        if (!(e.getGui() instanceof GuiContainer)) PANEL.onScreenClosed();
+        if (!(e.gui instanceof GuiContainer)) PANEL.onScreenClosed();
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onMouse(GuiScreenEvent.MouseInputEvent.Pre e) {
-        GuiScreen gui = e.getGui();
+        GuiScreen gui = e.gui;
         if (!(gui instanceof GuiContainer)) return;
         int mx = Mouse.getEventX() * gui.width / mc().displayWidth;
         int my = gui.height - Mouse.getEventY() * gui.height / mc().displayHeight - 1;
@@ -95,7 +95,7 @@ public class InventoryTodoForge {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onKey(GuiScreenEvent.KeyboardInputEvent.Pre e) {
-        GuiScreen gui = e.getGui();
+        GuiScreen gui = e.gui;
         if (!(gui instanceof GuiContainer)) return;
         if (!Keyboard.getEventKeyState()) {
             if (PANEL.isTyping()) e.setCanceled(true);
@@ -122,11 +122,11 @@ public class InventoryTodoForge {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onDraw(GuiScreenEvent.DrawScreenEvent.Post e) {
-        if (!(e.getGui() instanceof GuiContainer)) return;
+        if (!(e.gui instanceof GuiContainer)) return;
         GL11.glPushMatrix();
         GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_CURRENT_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         try {
-            PANEL.render(e.getGui(), new GfxImpl(e.getGui()), e.getMouseX(), e.getMouseY());
+            PANEL.render(e.gui, new GfxImpl(e.gui), e.mouseX, e.mouseY);
         } finally {
             GL11.glPopAttrib();
             GL11.glPopMatrix();
@@ -139,14 +139,14 @@ public class InventoryTodoForge {
         Core.clientTick();
         while (HUD_KEY.isPressed()) Hud.toggle();
         Minecraft mc = mc();
-        if (mc.player == null) return;
+        if (mc.thePlayer == null) return;
         if (mc.currentScreen instanceof GuiContainer) PANEL.tick(mc.currentScreen);
         else if (mc.currentScreen == null) Hud.tick();
     }
 
     @SubscribeEvent
     public void onOverlay(RenderGameOverlayEvent.Post e) {
-        if (e.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
+        if (e.type != RenderGameOverlayEvent.ElementType.ALL) return;
         Minecraft mc = mc();
         if (mc.currentScreen != null || mc.gameSettings.hideGUI) return;
         GL11.glPushMatrix();
