@@ -90,7 +90,7 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public String versionName() {
-        return "1.12.2";
+        return net.minecraftforge.fml.common.Loader.instance().getMCVersionString().replace("Minecraft ", "");
     }
 
     @Override
@@ -98,6 +98,9 @@ public class DevPlatformImpl implements DevPlatform {
 
     @Override
     public void loadWorld(String folder) {
-        mc().launchIntegratedServer(folder, folder, null);
+        // a new flat world when it does not exist yet (null settings only work for existing worlds)
+        boolean exists = new java.io.File(new java.io.File(mc().gameDir, "saves"), folder + "/level.dat").exists();
+        mc().launchIntegratedServer(folder, folder, exists ? null
+            : new net.minecraft.world.WorldSettings(1L, net.minecraft.world.GameType.SURVIVAL, false, false, net.minecraft.world.WorldType.FLAT));
     }
 }
