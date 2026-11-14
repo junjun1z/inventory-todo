@@ -24,6 +24,23 @@
 - **Remembers exact items** — metadata and NBT are kept, so specific machines, circuits or named items are counted correctly. Lists are saved per world/server and survive mods being added or removed.
 - **10 languages** — English, 日本語, 简体中文, 繁體中文, 한국어, Русский, Deutsch, Français, Español, Português (Brasil).
 
+## Supported languages
+
+The mod follows your Minecraft language setting. 10 languages are included:
+
+| Language | In game |
+|---|---|
+| English (default) | English |
+| Japanese | 日本語 |
+| Simplified Chinese | 简体中文 |
+| Traditional Chinese | 繁體中文 |
+| Korean | 한국어 |
+| Russian | Русский |
+| German | Deutsch |
+| French | Français |
+| Spanish | Español |
+| Brazilian Portuguese | Português (Brasil) |
+
 ## Optional integrations
 
 None of these are required. When installed, Inventory ToDo uses them automatically:
