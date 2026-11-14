@@ -364,6 +364,7 @@ public final class SelfTest {
                     step = 60;
                     return;
                 }
+                robotOk = true;
                 originX = calSx - calMx * scaleX;
                 originY = calSy - calMy * scaleY;
                 info(String.format("calibration %.3f %.3f origin %.0f,%.0f", scaleX, scaleY, originX, originY));
@@ -493,7 +494,7 @@ public final class SelfTest {
                 return;
             case 34:
                 dev.screenshot("selftest_tooltip");
-                if (robot == null) {
+                if (!robotOk) { // real mouse not available: the tooltip pixel checks need it
                     step = 40;
                     return;
                 }
@@ -654,6 +655,7 @@ public final class SelfTest {
     }
 
     private int probeX, probeY, probes, tipX, tipY, dndBefore;
+    private boolean robotOk;
     private Object dndItem;
 
     private static String viewerNames() {

@@ -73,6 +73,8 @@ differs, add `versions/<code_version>` and `loaders/<loader>/<code_version>` and
 Put the jar into an instance, create `config/inventorytodo/selftest.flag`, launch straight into a world
 (`prismlauncher --launch <instance> --world <world>`). The test drives the panel (also with real mouse/keyboard
 input through `java.awt.Robot`), saves screenshots and `selftest_result.txt` in the game directory, then quits.
+With real input it also checks that the panel's tooltips are really drawn (pixels in the screenshots) and, if JEI,
+EMI or REI is installed, drags an item from the viewer's list onto the panel.
 
 ## Nested `oldforge/` build (MinecraftForge 1.8.9 - 1.11.2)
 
