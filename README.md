@@ -97,7 +97,7 @@ Client-side only: not needed on servers, and you can join servers without it.
 | Mod | What you get |
 | --- | --- |
 | NEI (original or GTNH fork) | Modifier+click / drag & drop from the item list, recipes/usages on icon click, NEI keys over list items |
-| JEI (1.18+) / EMI / REI | Hovered-item adding, drag & drop, recipes/usages on icon click |
+| JEI (1.18+) / EMI / REI (1.17+) | Hovered-item adding, drag & drop, recipes/usages on icon click |
 
 ## FAQ
 

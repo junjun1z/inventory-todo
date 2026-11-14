@@ -3,6 +3,16 @@
 All notable changes to Inventory ToDo. The newest version is at the top.
 The release workflow uses the section that matches the tag as the release notes.
 
+## [1.2.1]
+
+### Fixed
+- Drag & drop from recipe viewers did nothing:
+  - JEI (1.18+), EMI and REI (1.17+): dragging an item from the viewer's list or bookmarks/favorites onto the panel now adds it (JEI ghost-ingredient handler, EMI drag-drop handler, REI draggable-stack visitor; all optional)
+  - NEI 1.7.10 (original and GTNH fork): an item picked up in NEI is added when it is released or clicked over the panel, instead of the click starting to edit a note
+- Minecraft 1.21.6+ and 26.x: the panel's own tooltips (buttons, rows, item tooltips) were never drawn
+- EMI / REI no longer draw their side panels under the to-do panel (like JEI already did)
+- REI on Fabric: the item under the mouse in REI's list can be added with the add key / modifier+click again
+
 ## [1.2.0]
 
 ### Added

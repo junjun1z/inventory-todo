@@ -10,7 +10,8 @@
   "icon": "assets/inventorytodo/icon.png",
   "environment": "client",
   "entrypoints": {
-    "client": ["io.github.junjun1z.inventorytodo.fabric.InventoryTodoFabric"]
+    "client": ["io.github.junjun1z.inventorytodo.fabric.InventoryTodoFabric"],
+    "rei": ["io.github.junjun1z.inventorytodo.core.ReiEntry"]
   },
   "mixins": ["inventorytodo.mixins.json"],
   "accessWidener": "inventorytodo.accesswidener",

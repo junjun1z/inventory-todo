@@ -160,6 +160,33 @@ public class SelfTestMod {
         for (char c : s.toCharArray()) type(c, c == 'e' ? Keyboard.KEY_E : 0);
     }
 
+    private final List<int[]> neiPos = new ArrayList<>();
+    private final List<ItemStack> neiItems = new ArrayList<>();
+    private int neiCountBefore;
+
+    private boolean hasItem(ItemStack s) throws Exception {
+        for (TodoEntry e : store().entries)
+            if (e.item != null && e.item.getItem() == s.getItem() && e.item.getItemDamage() == s.getItemDamage()) return true;
+        return false;
+    }
+
+    /** NEI's item panel (original: LayoutManager.itemPanel, GTNH: ItemPanels.itemPanel) */
+    private static final class NeiPanel {
+
+        static Object itemPanel() throws Exception {
+            try {
+                return Class.forName("codechicken.nei.ItemPanels").getField("itemPanel").get(null);
+            } catch (ClassNotFoundException e) {
+                return Class.forName("codechicken.nei.LayoutManager").getField("itemPanel").get(null);
+            }
+        }
+
+        static Object dragged() throws Exception {
+            Object ip = itemPanel();
+            return ip.getClass().getField("draggedStack").get(ip);
+        }
+    }
+
     private static final class NeiHelper {
 
         static void keyTyped(GuiContainer gui, char c, int key) {
@@ -736,12 +763,112 @@ public class SelfTestMod {
                 }
                 case 33: {
                     check("Drag ends on release", !(Boolean) get(TodoPanel.INSTANCE, "dragging"), null);
+                    store().mode = TodoStore.Mode.FOLLOW;
+                    step = nei ? 40 : 49;
+                    wait = 5;
+                    return;
+                }
+
+                // ---------------- NEI drag & drop with real input ----------------
+                case 40: {
+                    // two different items in NEI's item list (positions found without moving the mouse)
+                    neiPos.clear();
+                    List<ItemStack> seen = new ArrayList<>();
+                    Object ip = NeiPanel.itemPanel();
+                    int x0 = ip.getClass().getField("x").getInt(ip), y0 = ip.getClass().getField("y").getInt(ip);
+                    int w = ip.getClass().getField("w").getInt(ip), h = ip.getClass().getField("h").getInt(ip);
+                    Method over = ip.getClass().getMethod("getStackMouseOver", int.class, int.class);
+                    for (int y = y0 + 20; y < y0 + h - 20 && neiPos.size() < 2; y += 18) {
+                        for (int x = x0 + 9; x < x0 + w - 9 && neiPos.size() < 2; x += 18) {
+                            ItemStack st = (ItemStack) over.invoke(ip, x, y);
+                            if (st == null) continue;
+                            boolean dup = false;
+                            for (ItemStack o : seen) dup |= o.getItem() == st.getItem() && o.getItemDamage() == st.getItemDamage();
+                            for (TodoEntry e2 : store().entries) dup |= e2.item != null && e2.item.getItem() == st.getItem();
+                            if (dup) continue;
+                            seen.add(st);
+                            neiPos.add(new int[] { x, y });
+                            neiItems.add(st.copy());
+                        }
+                    }
+                    info("NEI item panel at " + x0 + "," + y0 + " " + w + "x" + h + ", items picked: " + neiItems);
+                    if (neiPos.size() < 2) {
+                        check("Two NEI items found to drag", false, neiPos.size());
+                        step = 49;
+                        return;
+                    }
+                    neiCountBefore = store().entries.size();
+                    robotMoveGui(neiPos.get(0)[0], neiPos.get(0)[1]);
+                    step++;
+                    wait = 4;
+                    return;
+                }
+                case 41:
+                    robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                    step++;
+                    wait = 4;
+                    return;
+                case 42:
+                    // leave the slot while held: NEI starts dragging the item
+                    robotMoveGui(neiPos.get(0)[0] - 30, neiPos.get(0)[1] + 10);
+                    step++;
+                    wait = 4;
+                    return;
+                case 43:
+                    info("NEI dragging: " + NeiPanel.dragged());
+                    // over a note row of the panel (used to start editing the note instead)
+                    robotMoveGui(geti("px") + 60, geti("listTop") + 8);
+                    step++;
+                    wait = 5;
+                    return;
+                case 44:
+                    robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                    step++;
+                    wait = 6;
+                    return;
+                case 45: {
+                    check("Real drag from NEI + release on the panel adds the item", hasItem(neiItems.get(0)),
+                        store().entries.size() - neiCountBefore);
+                    check("... and NEI no longer drags it", NeiPanel.dragged() == null, NeiPanel.dragged());
+                    check("... and no note row started editing", get(TodoPanel.INSTANCE, "field") == null, null);
+                    // middle click picks the item up in NEI (it follows the cursor), then a click on the panel drops it
+                    robotMoveGui(neiPos.get(1)[0], neiPos.get(1)[1]);
+                    step++;
+                    wait = 4;
+                    return;
+                }
+                case 46:
+                    robot.mousePress(InputEvent.BUTTON2_DOWN_MASK);
+                    robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+                    step++;
+                    wait = 4;
+                    return;
+                case 47:
+                    info("NEI holding after middle click: " + NeiPanel.dragged());
+                    robotMoveGui(geti("px") + 60, geti("listTop") + 8);
+                    step++;
+                    wait = 4;
+                    return;
+                case 48:
+                    shot("11_nei_held_over_panel");
+                    robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                    robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                    step = 50;
+                    wait = 6;
+                    return;
+                case 50:
+                    check("Item held from NEI + click on the panel adds it", hasItem(neiItems.get(1)), null);
+                    check("... and NEI no longer holds it", NeiPanel.dragged() == null, NeiPanel.dragged());
+                    check("... and no note row started editing", get(TodoPanel.INSTANCE, "field") == null, null);
+                    shot("11_nei_dropped");
+                    step = 49;
+                    return;
+                case 49:
                     // hover a row item so the tooltip shows in the screenshot
                     robotMoveGui(geti("px") + 22, geti("listTop") + 18 + 8);
                     step = 90;
                     wait = 5;
                     return;
-                }
                 case 30:
                     step = 90;
                     return;

@@ -26,6 +26,8 @@ sourceSets {
     main {
         java {
             srcDir new File(root, 'common/src/main/java')
+            // compile-time stubs of the EMI / REI plugin interfaces (excluded from the jar below)
+            srcDir new File(root, 'common/src/stubs/java')
             srcDir new File(root, "versions/${project.property('code_version')}/src/main/java")
             srcDir new File(root, "loaders/${loader}/${project.property('code_version')}/src/main/java")
             // development self-test, only with -Pselftest (never in release jars)
@@ -75,6 +77,8 @@ processResources {
 
 jar {
     from(new File(root, '../LICENSE')) { rename { 'LICENSE_inventorytodo' } }
+    // the recipe viewers provide these at runtime; the stubs must never ship
+    exclude 'dev/emi/**', 'me/shedaniel/**'
     manifest {
         attributes(
             'Implementation-Title': 'Inventory ToDo',

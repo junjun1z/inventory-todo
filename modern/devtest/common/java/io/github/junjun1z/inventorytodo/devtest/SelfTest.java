@@ -375,6 +375,7 @@ public final class SelfTest {
             }
             case 23:
                 check("Real click outside keeps the inventory", dev.screen() == currentScreen && mc().isContainerScreen(currentScreen), dev.screen());
+                dev.screenshot("selftest_tooltip_none"); // baseline for the tooltip pixel checks
                 move(geti("px") + 8, footerY() + 5);
                 click();
                 step++;
@@ -492,7 +493,112 @@ public final class SelfTest {
                 return;
             case 34:
                 dev.screenshot("selftest_tooltip");
+                if (robot == null) {
+                    step = 40;
+                    return;
+                }
+                tipX = geti("px") + 22;
+                tipY = geti("listTop") + 2 * 18 + 8;
+                step = 36;
+                wait = 15;
+                return;
+            case 36: {
+                // the item tooltip of the hovered row must really be on screen (26.x dropped it silently)
+                int[] n = tooltipPixels("selftest_tooltip", tipX, tipY);
+                check("Real mouse over an item row draws its tooltip", n[1] - n[0] > 40, "tooltip pixels " + n[1] + " (baseline " + n[0] + ")");
+                // a text tooltip of the panel itself: the HUD button
+                tipX = (Integer) call("btnHudX") + 5;
+                tipY = geti("py") + 5;
+                move(tipX, tipY);
+                step++;
+                wait = 6;
+                return;
+            }
+            case 37:
+                dev.screenshot("selftest_tooltip_text");
+                step++;
+                wait = 15;
+                return;
+            case 38: {
+                int[] n = tooltipPixels("selftest_tooltip_text", tipX, tipY);
+                check("Real mouse over a panel button draws its text tooltip", n[1] - n[0] > 40, "tooltip pixels " + n[1] + " (baseline " + n[0] + ")");
+                if (io.github.junjun1z.inventorytodo.core.RecipeViewer.any()) {
+                    info("recipe viewers: " + viewerNames());
+                    step = 70;
+                } else {
+                    info("no recipe viewer installed: drag & drop test skipped");
+                    step = 40;
+                }
+                return;
+            }
+            // ---------------- drag & drop from the recipe viewer (real mouse) ----------------
+            case 70:
+                cfg.mode = Settings.Mode.FOLLOW;
+                cfg.minimized = false;
+                cfg.save();
+                dndBefore = store.entries.size();
+                probeX = mc().screenWidth() - 12;
+                probeY = 30;
+                probes = 0;
+                move(probeX, probeY);
+                step++;
+                wait = 3;
+                return;
+            case 71: {
+                // walk over the viewer's item list (right side) until an item that is not in the list yet is hovered
+                Object hov = io.github.junjun1z.inventorytodo.core.RecipeViewer.hovered();
+                if (hov != null && !inList(hov)) {
+                    dndItem = mc().copyOne(hov);
+                    info("dragging " + mc().registryId(dndItem) + " from " + probeX + "," + probeY);
+                    robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                    step++;
+                    wait = 4;
+                    return;
+                }
+                if (++probes > 400) {
+                    check("Item found in the recipe viewer's list", false, probes);
+                    step = 40;
+                    return;
+                }
+                probeX -= 9;
+                if (probeX < mc().guiLeft(currentScreen) + mc().imageWidth(currentScreen) + 8) {
+                    probeX = mc().screenWidth() - 12;
+                    probeY += 9;
+                }
+                move(probeX, probeY);
+                wait = 2;
+                return;
+            }
+            case 72:
+                move(probeX - 12, probeY + 6); // start the drag
+                step++;
+                wait = 4;
+                return;
+            case 73:
+                move(probeX - 60, probeY + 30);
+                step++;
+                wait = 4;
+                return;
+            case 74:
+                // over the first row (a note): before the fix nothing happened / the note started editing
+                move(geti("px") + 60, geti("listTop") + 8);
+                step++;
+                wait = 8;
+                return;
+            case 75:
+                dev.screenshot("selftest_dnd_over_panel");
+                robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                step++;
+                wait = 8;
+                return;
+            case 76:
+                check("Real drag & drop from the recipe viewer adds the item", inList(dndItem) && store.entries.size() == dndBefore + 1,
+                    mc().registryId(dndItem) + " rows " + dndBefore + " -> " + store.entries.size());
+                check("... without editing a note", getf("field") == null, null);
+                check("... and the inventory stays open", dev.screen() == currentScreen, dev.screen());
+                dev.screenshot("selftest_dnd_done");
                 step = 40;
+                wait = 5;
                 return;
             // ---------------- input through the loader's own event system ----------------
             case 60: {
@@ -547,7 +653,55 @@ public final class SelfTest {
         }
     }
 
-    private int probeX, probeY;
+    private int probeX, probeY, probes, tipX, tipY, dndBefore;
+    private Object dndItem;
+
+    private static String viewerNames() {
+        StringBuilder sb = new StringBuilder();
+        for (io.github.junjun1z.inventorytodo.core.RecipeViewer v : io.github.junjun1z.inventorytodo.core.RecipeViewer.ALL)
+            sb.append(v.name()).append(' ');
+        return sb.toString().trim();
+    }
+
+    private static boolean inList(Object stack) {
+        for (TodoEntry e : Core.store().entries) if (e.item != null && mc().sameItem(e.item, stack)) return true;
+        return false;
+    }
+
+    private static Object call(String method) throws Exception {
+        Method m = TodoPanel.class.getDeclaredMethod(method);
+        m.setAccessible(true);
+        return m.invoke(panel());
+    }
+
+    /**
+     * Counts tooltip-frame pixels (purple, no green) in the area where a tooltip at the GUI position appears, in the
+     * baseline screenshot and in the given one: {baseline, shot}.
+     */
+    private int[] tooltipPixels(String name, int gx, int gy) {
+        return new int[] { purple("selftest_tooltip_none", gx, gy), purple(name, gx, gy) };
+    }
+
+    private int purple(String name, int gx, int gy) {
+        try {
+            Path f = dev.gameDir().resolve("screenshots").resolve(name + ".png");
+            if (!Files.exists(f)) f = dev.gameDir().resolve(name + ".png");
+            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(f.toFile());
+            double k = img.getWidth() / (double) mc().screenWidth();
+            int x0 = (int) ((gx - 4) * k), x1 = (int) Math.min(img.getWidth(), (gx + 140) * k);
+            int y0 = (int) Math.max(0, (gy - 40) * k), y1 = (int) Math.min(img.getHeight(), (gy + 60) * k);
+            int n = 0;
+            for (int y = y0; y < y1; y++)
+                for (int x = Math.max(0, x0); x < x1; x++) {
+                    int c = img.getRGB(x, y), r = (c >> 16) & 255, g = (c >> 8) & 255, b = c & 255;
+                    if (g < 14 && b > 40 && b > r + 20) n++;
+                }
+            return n;
+        } catch (Throwable t) {
+            info("screenshot " + name + " unreadable: " + t);
+            return -1;
+        }
+    }
 
     private void finish() {
         Core.devTick = null;

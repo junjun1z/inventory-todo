@@ -66,8 +66,24 @@ public final class NeiFrontend implements IContainerInputHandler, IContainerDraw
         return false;
     }
 
+    /** NEI already held a dragged item when the current button press started */
+    private boolean pressStartedWithNeiItem;
+
     @Override
     public boolean mouseClicked(GuiContainer gui, int mx, int my, int button) {
+        // An item picked up in NEI (dragged out of the item list / bookmarks, or middle-clicked) follows the cursor
+        // until the next click. NEI drops it through INEIGuiHandler.handleDragNDrop, but only if this handler (first
+        // in the list, so typing works) lets the click through - and the GTNH bookmark area, which can lie under the
+        // panel, would take it first. So drop it on the panel here, and otherwise leave the click to NEI.
+        ItemStack held = NeiDrag.held();
+        pressStartedWithNeiItem = held != null;
+        if (held != null) {
+            if (panel.dropStack(gui, mx, my, held)) {
+                NeiDrag.clear();
+                return true;
+            }
+            return false;
+        }
         return panel.mouseClicked(gui, mx, my, button);
     }
 
@@ -76,6 +92,10 @@ public final class NeiFrontend implements IContainerInputHandler, IContainerDraw
 
     @Override
     public void onMouseUp(GuiContainer gui, int mx, int my, int button) {
+        // dragged out of NEI and released over the panel (NEI itself would keep it on the cursor until a click)
+        ItemStack held = NeiDrag.held();
+        if (held != null && !pressStartedWithNeiItem && panel.dropStack(gui, mx, my, held)) NeiDrag.clear();
+        pressStartedWithNeiItem = false;
         panel.mouseUp(gui, mx, my, button);
     }
 
@@ -184,7 +204,9 @@ public final class NeiFrontend implements IContainerInputHandler, IContainerDraw
 
     @Override
     public boolean handleDragNDrop(GuiContainer gui, int mx, int my, ItemStack stack, int button) {
-        return panel.dropStack(gui, mx, my, stack);
+        if (!panel.dropStack(gui, mx, my, stack)) return false;
+        stack.stackSize = 0; // used up: NEI then stops dragging it (both NEI versions check for 0)
+        return true;
     }
 
     @Override

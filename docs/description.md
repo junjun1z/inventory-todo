@@ -33,7 +33,7 @@ None of these are required. When installed, Inventory ToDo uses them automatical
 | NEI (original or GTNH fork) | Modifier+click and drag & drop from the item list, recipe/usage on icon click, NEI keys (R / U) work over list items |
 | JEI (1.18 and newer) | Hovered-item adding, drag & drop, recipes/usages on icon click |
 | EMI | Hovered-item adding, drag & drop, recipes/usages on icon click |
-| REI | Hovered-item adding, drag & drop, recipes/usages on icon click |
+| REI (1.17 and newer) | Hovered-item adding, drag & drop, recipes/usages on icon click |
 
 ## Supported versions
 

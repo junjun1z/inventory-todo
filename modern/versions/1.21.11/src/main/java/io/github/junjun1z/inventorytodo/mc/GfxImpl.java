@@ -7,6 +7,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -54,11 +56,26 @@ public class GfxImpl implements Gfx {
         g.nextStratum();
     }
 
+    // setTooltipForNextFrame() is only drawn by the screen's own render pass, and the loaders' "after render"
+    // events (Fabric afterRender/afterExtract, NeoForge/Forge ScreenEvent.Render.Post) come after it: a tooltip
+    // set there was silently dropped. Draw it right away on a new stratum instead (what the deferred pass does).
+    private void show(List<ClientTooltipComponent> lines, int mx, int my) {
+        if (lines.isEmpty()) return;
+        g.nextStratum();
+        g.renderTooltip(font, lines, mx, my, DefaultTooltipPositioner.INSTANCE, null);
+    }
+
+    private static List<ClientTooltipComponent> components(List<Component> lines) {
+        List<ClientTooltipComponent> out = new ArrayList<>();
+        for (Component l : lines) out.add(ClientTooltipComponent.create(l.getVisualOrderText()));
+        return out;
+    }
+
     @Override
     public void tooltip(List<String> lines, int mx, int my) {
         List<Component> c = new ArrayList<>();
         for (String l : lines) c.add(Component.literal(l));
-        g.setComponentTooltipForNextFrame(font, c, mx, my);
+        show(components(c), mx, my);
     }
 
     @Override
@@ -66,6 +83,8 @@ public class GfxImpl implements Gfx {
         ItemStack st = (ItemStack) stack;
         List<Component> c = new ArrayList<>(Screen.getTooltipFromItem(Minecraft.getInstance(), st));
         for (String l : extra) c.add(Component.literal(l));
-        g.setTooltipForNextFrame(font, c, st.getTooltipImage(), mx, my);
+        List<ClientTooltipComponent> out = components(c);
+        st.getTooltipImage().ifPresent(img -> out.add(out.isEmpty() ? 0 : 1, ClientTooltipComponent.create(img)));
+        show(out, mx, my);
     }
 }

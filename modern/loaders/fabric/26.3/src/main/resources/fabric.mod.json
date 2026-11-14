@@ -11,7 +11,9 @@
   "environment": "client",
   "entrypoints": {
     "client": ["io.github.junjun1z.inventorytodo.fabric.InventoryTodoFabric"],
-    "jei_mod_plugin": ["io.github.junjun1z.inventorytodo.mc.JeiCompat"]
+    "jei_mod_plugin": ["io.github.junjun1z.inventorytodo.mc.JeiCompat"],
+    "emi": ["io.github.junjun1z.inventorytodo.core.EmiEntry"],
+    "rei_client": ["io.github.junjun1z.inventorytodo.core.ReiEntry"]
   },
   "accessWidener": "inventorytodo.accesswidener",
   "depends": {
