@@ -134,6 +134,8 @@ public final class ReflectViewers {
         }
     }
 
+    private static final double REI_PRIORITY = 100.0;
+
     /** Called by {@link ReiEntry} (REIClientPlugin.registerScreens) */
     static void registerRei(Object screenRegistry) {
         try {
@@ -171,10 +173,12 @@ public final class ReflectViewers {
                         if (b == null) return Stream.empty();
                         return Stream.of(ofRect.invoke(null, newRect.newInstance(b[0], b[1], b[2], b[3])));
                     }
+                    // before REI's own targets: its favorites panel (left side, also behind the to-do panel) would
+                    // take the drop otherwise. Outside the panel we answer PASS, so REI's targets still work there.
                     case "getPriority":
-                        return 0.0;
+                        return REI_PRIORITY;
                     case "compareTo":
-                        return Double.compare(0.0, ((Number) noArg(a[0], "getPriority")).doubleValue());
+                        return Double.compare(REI_PRIORITY, ((Number) noArg(a[0], "getPriority")).doubleValue());
                     default:
                         return invokeDefault(self, m, a);
                 }
