@@ -114,6 +114,13 @@ public class DevPlatformImpl implements DevPlatform {
     public void focusWindow() {
         try {
             Class.forName("org.lwjgl.sdl.SDLVideo").getMethod("SDL_RaiseWindow", long.class).invoke(null, mc().getWindow().handle());
+        } catch (ClassNotFoundException e) {
+            // 26.1 / 26.2 still use GLFW
+            try {
+                Class.forName("org.lwjgl.glfw.GLFW").getMethod("glfwFocusWindow", long.class).invoke(null, mc().getWindow().handle());
+            } catch (Throwable t) {
+                io.github.junjun1z.inventorytodo.core.Log.warn("focusWindow failed: " + t);
+            }
         } catch (Throwable t) {
             io.github.junjun1z.inventorytodo.core.Log.warn("focusWindow failed: " + t);
         }

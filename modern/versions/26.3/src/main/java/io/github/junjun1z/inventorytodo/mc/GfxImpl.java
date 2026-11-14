@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import io.github.junjun1z.inventorytodo.core.Gfx;
+import io.github.junjun1z.inventorytodo.core.Log;
 
 /** {@link Gfx} on top of GuiGraphicsExtractor (26.x: deferred GUI rendering with strata). */
 public class GfxImpl implements Gfx {
@@ -60,28 +61,43 @@ public class GfxImpl implements Gfx {
     // setTooltipForNextFrame() is only drawn by the screen's own render pass, and the loaders' "after render"
     // events (Fabric afterRender/afterExtract, NeoForge/Forge ScreenEvent.Render.Post) come after it: a tooltip
     // set there was silently dropped. Draw it right away on a new stratum instead (what the deferred pass does).
-    private void show(List<ClientTooltipComponent> lines, int mx, int my) {
-        if (lines.isEmpty()) return;
-        g.nextStratum();
+    /** @return false if the tooltip could not be drawn directly (the caller then falls back) */
+    private boolean show(List<ClientTooltipComponent> lines, int mx, int my) {
+        if (lines.isEmpty()) return true;
+        Method m = tooltipMethod();
+        if (m == null) return false;
         try {
-            Method m = tooltipMethod();
+            g.nextStratum();
             if (m.getParameterCount() == 7) m.invoke(g, font, lines, mx, my, DefaultTooltipPositioner.INSTANCE, null, false);
             else m.invoke(g, font, lines, mx, my, DefaultTooltipPositioner.INSTANCE, null);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException(e);
+            return true;
+        } catch (Throwable t) {
+            disable("drawing failed: " + t);
+            return false;
         }
     }
 
     private static Method tooltip;
+    private static boolean tooltipBroken;
 
-    /** GuiGraphicsExtractor.tooltip(Font, List, x, y, positioner, style[, extraSpaceAfterFirstLine]): 26.3 added the flag */
+    private static void disable(String why) {
+        if (!tooltipBroken) Log.warn("Panel tooltips: direct drawing disabled (" + why + "), using the deferred tooltip instead");
+        tooltipBroken = true;
+    }
+
+    /** GuiGraphicsExtractor.tooltip(Font, List, x, y, positioner, style[, extraSpaceAfterFirstLine]): 26.3 added the flag. Null if unusable. */
     private static Method tooltipMethod() {
+        if (tooltipBroken) return null;
         if (tooltip == null) {
-            for (Method m : GuiGraphicsExtractor.class.getMethods()) {
-                Class<?>[] p = m.getParameterTypes();
-                if (m.getName().equals("tooltip") && (p.length == 6 || p.length == 7) && p[0] == Font.class && p[1] == List.class) tooltip = m;
+            try {
+                for (Method m : GuiGraphicsExtractor.class.getMethods()) {
+                    Class<?>[] p = m.getParameterTypes();
+                    if (m.getName().equals("tooltip") && (p.length == 6 || p.length == 7) && p[0] == Font.class && p[1] == List.class) tooltip = m;
+                }
+            } catch (Throwable t) {
+                tooltip = null;
             }
-            if (tooltip == null) throw new IllegalStateException("GuiGraphicsExtractor.tooltip not found");
+            if (tooltip == null) disable("GuiGraphicsExtractor.tooltip not found");
         }
         return tooltip;
     }
@@ -96,7 +112,7 @@ public class GfxImpl implements Gfx {
     public void tooltip(List<String> lines, int mx, int my) {
         List<Component> c = new ArrayList<>();
         for (String l : lines) c.add(Component.literal(l));
-        show(components(c), mx, my);
+        if (!show(components(c), mx, my)) g.setComponentTooltipForNextFrame(font, c, mx, my);
     }
 
     @Override
@@ -106,6 +122,6 @@ public class GfxImpl implements Gfx {
         for (String l : extra) c.add(Component.literal(l));
         List<ClientTooltipComponent> out = components(c);
         st.getTooltipImage().ifPresent(img -> out.add(out.isEmpty() ? 0 : 1, ClientTooltipComponent.create(img)));
-        show(out, mx, my);
+        if (!show(out, mx, my)) g.setTooltipForNextFrame(font, c, st.getTooltipImage(), mx, my);
     }
 }

@@ -262,6 +262,26 @@ public final class ReflectViewers {
         Object call(Object self, Method m, Object[] args) throws Throwable;
     }
 
+    private static boolean proxyFailed;
+
+    /** Harmless answer of the given type: false / 0 / empty / the enum's PASS / null */
+    private static Object safeDefault(Class<?> r) {
+        if (r == boolean.class) return false;
+        if (r == int.class) return 0;
+        if (r == long.class) return 0L;
+        if (r == double.class) return 0.0;
+        if (r == float.class) return 0f;
+        if (r == Stream.class) return Stream.empty();
+        if (r == Optional.class) return Optional.empty();
+        if (Collection.class.isAssignableFrom(r)) return Collections.emptyList();
+        if (r.isEnum()) {
+            try {
+                return enumConstant(r, "PASS");
+            } catch (Throwable ignored) {}
+        }
+        return null;
+    }
+
     /** Implements a viewer interface; Object methods are answered here */
     private static Object proxy(Class<?> type, Handler h) {
         InvocationHandler ih = (self, m, a) -> {
@@ -275,7 +295,14 @@ public final class ReflectViewers {
                         return "InventoryToDo$" + type.getSimpleName();
                 }
             }
-            return h.call(self, m, a);
+            try {
+                return h.call(self, m, a);
+            } catch (Throwable t) {
+                // never throw into the viewer's render / input loop
+                if (!proxyFailed) Log.warn("Recipe viewer callback " + type.getSimpleName() + "." + m.getName() + " failed: " + t);
+                proxyFailed = true;
+                return safeDefault(m.getReturnType());
+            }
         };
         return Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[] { type }, ih);
     }

@@ -113,7 +113,13 @@ public class JeiCompat implements IModPlugin {
 
         private <I> List<Target<I>> targets(AbstractContainerScreen<?> screen, I ingredient, boolean doStart) {
             if (!(ingredient instanceof ItemStack) || ((ItemStack) ingredient).isEmpty()) return Collections.emptyList();
-            int[] b = TodoPanel.INSTANCE.bounds(screen);
+            int[] b;
+            try {
+                b = TodoPanel.INSTANCE.bounds(screen);
+            } catch (Throwable t) {
+                Log.warn("JEI drop target unavailable: " + t);
+                return Collections.emptyList();
+            }
             if (b == null) return Collections.emptyList();
             if (doStart) dragging = true;
             Rect2i area = new Rect2i(b[0], b[1], b[2], b[3]);
@@ -127,7 +133,11 @@ public class JeiCompat implements IModPlugin {
 
                 @Override
                 public void accept(I dropped) {
-                    TodoPanel.INSTANCE.dropStack(screen, area.getX() + area.getWidth() / 2.0, area.getY() + area.getHeight() / 2.0, dropped);
+                    try {
+                        TodoPanel.INSTANCE.dropStack(screen, area.getX() + area.getWidth() / 2.0, area.getY() + area.getHeight() / 2.0, dropped);
+                    } catch (Throwable t) {
+                        Log.warn("Could not add the dropped item: " + t);
+                    }
                 }
             });
             return out;
